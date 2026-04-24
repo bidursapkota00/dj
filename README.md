@@ -1,34 +1,56 @@
 # Django Complete Guide
 
-## 3.1 The MVC Architectural Pattern
+## Table of Content
 
-### 3.1.1 Introduction to MVC
+1. [The MVC Architectural Pattern](#the-mvc-architectural-pattern)
+2. [The Role of the Backend](#the-role-of-the-backend)
+3. [Introduction to Django](#introduction-to-django)
+4. [URLs and Views](#urls-and-views)
+5. [Templates and Static Files](#templates-and-static-files)
+6. [Data and Models](#data-and-models)
+7. [The Django Admin Interface](#the-django-admin-interface)
+8. [Forms](#forms)
+9. [Sessions and Cookies](#sessions-and-cookies)
+10. [Authentication and Authorisation](#authentication-and-authorisation)
+11. [Practical Exercises](#practical-exercises)
+12. [Middleware](#middleware)
+13. [Comparison of Backend Frameworks](#comparison-of-backend-frameworks)
+14. [Database Types](#database-types)
+15. [Building a Complete CRUD Application](#building-a-complete-crud-application)
+16. [Testing](#testing)
+17. [Deployment](#deployment)
+18. [UI Testing with Selenium](#ui-testing-with-selenium)
+19. [Common Web Security Vulnerabilities](#common-web-security-vulnerabilities)
+
+## The MVC Architectural Pattern
+
+### Introduction to MVC
 
 MVC (Model-View-Controller) is a software architectural pattern that separates an application into three interconnected components. Originally developed for desktop graphical user interfaces, MVC has become the foundational pattern for most modern web frameworks. Its central principle is the separation of concerns: each component has a single, well-defined responsibility and should not interfere with the responsibilities of the others.
 
 This separation yields several practical benefits: the codebase becomes easier to develop, test, and maintain; frontend and backend developers can work in parallel; individual components can be modified or replaced without affecting the rest of the application; and each component can be tested independently.
 
-### 3.1.2 Model — The Data Layer
+### Model — The Data Layer
 
 The Model represents the application's data and business logic. It is responsible for defining data structures (tables, fields, relationships), validating data before it is persisted, performing database queries and updates, implementing business rules (calculations, constraints, workflows), and notifying other components when data changes.
 
 The Model is entirely independent of the user interface. It does not know or care how data will be displayed—it focuses solely on data management.
 
-### 3.1.3 View — The Presentation Layer
+### View — The Presentation Layer
 
 The View is responsible for rendering data for the user. It handles the visual presentation: generating HTML, applying CSS, formatting data for display, and producing responses in various formats (HTML, JSON, XML). The View receives data from the Controller and renders it. Critically, the View should contain no business logic—it should only display, never process data.
 
-### 3.1.4 Controller — The Logic Layer
+### Controller — The Logic Layer
 
 The Controller acts as an intermediary between the Model and the View. It receives incoming HTTP requests from users, parses and validates user input, calls appropriate Model methods to retrieve or modify data, selects the appropriate View for the response, and returns the final HTTP response.
 
 The Controller is the "traffic controller" of the application, directing the flow of data between the Model and the View.
 
-![MVC Diagram](/images/unit-3/mvc.webp)
+![MVC Diagram](/images/mvc.webp)
 
 _Figure 3.1: The MVC architectural pattern showing the interaction between Model, View, and Controller._
 
-### 3.1.5 The Request-Response Cycle in MVC
+### The Request-Response Cycle in MVC
 
 The following sequence describes how a typical request is processed in an MVC application:
 
@@ -44,7 +66,7 @@ The following sequence describes how a typical request is processed in an MVC ap
 10. The response is sent back to the user's browser.
 11. The browser renders the page for the user.
 
-### 3.1.6 Benefits of MVC
+### Benefits of MVC
 
 _Table 3.1: Benefits of the MVC architectural pattern._
 
@@ -58,7 +80,7 @@ _Table 3.1: Benefits of the MVC architectural pattern._
 | **Scalability**            | Individual components can be scaled independently                        |
 | **Code Organisation**      | A clear structure makes the codebase easier to navigate                  |
 
-### 3.1.7 MVC Implementations Across Frameworks
+### MVC Implementations Across Frameworks
 
 Different web frameworks implement the MVC pattern with varying terminology, but the core principle of separation of concerns remains consistent.
 
@@ -75,15 +97,15 @@ _Table 3.2: MVC implementations in popular web frameworks._
 
 ---
 
-## 3.2 The Role of the Backend
+## The Role of the Backend
 
-### 3.2.1 What Is the Backend?
+### What Is the Backend?
 
 The backend (also called the server-side) is the part of a web application that operates on the server and is invisible to the end user. It is responsible for processing user requests, managing databases, executing business logic, authenticating and authorising users, and sending responses to the frontend.
 
 While the frontend is what users interact with—buttons, forms, visual layout—the backend is what makes everything function behind the scenes.
 
-### 3.2.2 Frontend versus Backend
+### Frontend versus Backend
 
 _Table 3.3: Comparison of frontend and backend responsibilities._
 
@@ -95,11 +117,11 @@ _Table 3.3: Comparison of frontend and backend responsibilities._
 | Focuses on building the user interface             | Handles data processing and application logic               |
 | Includes elements like buttons, forms, and layouts | Includes databases, APIs, and authentication systems        |
 
-### 3.2.3 Core Responsibilities of the Backend
+### Core Responsibilities of the Backend
 
 **Server Logic:** A server is a computer (or process) that listens continuously for incoming requests on a designated port (e.g., port 80 for HTTP, port 443 for HTTPS). When a request arrives, the server creates a thread or process to handle it, processes the request, generates a response, and sends the response back to the client.
 
-![HTTP](/images/unit-3/http.webp)
+![HTTP](/images/http.webp)
 
 _Figure 3.2: HTTP request-response communication between client and server._
 
@@ -114,7 +136,7 @@ Routes can be static (exact URL match, such as `/about`), dynamic (URLs containi
 
 **Business Logic:** Business logic is the code that implements the rules and operations specific to the application. Examples include calculating discounts and totals, checking user permissions, validating uniqueness constraints, processing transactions, and generating reports. Business logic should be separated from the presentation layer, testable in isolation, reusable across interfaces, and robust in handling edge cases.
 
-### 3.2.4 Security Layers
+### Security Layers
 
 Security is critical for backend applications. Multiple layers of defence protect the application and its users:
 
@@ -127,9 +149,9 @@ Security is critical for backend applications. Multiple layers of defence protec
 
 ---
 
-## 3.3 Introduction to Django
+## Introduction to Django
 
-### 3.3.1 What Is Django?
+### What Is Django?
 
 Django is a high-level Python web framework designed for the rapid development of secure and maintainable web applications. It follows four core principles:
 
@@ -149,7 +171,7 @@ _Table 3.4: Key features of Django and their benefits._
 | **Large Community**                 | Extensive documentation and packages         |
 | **Authentication System**           | Built-in user management                     |
 
-### 3.3.2 The MTV Pattern — Django's Interpretation of MVC
+### The MTV Pattern — Django's Interpretation of MVC
 
 Django implements the MVC pattern using its own terminology: MTV (Model-Template-View). The correspondence between the two naming conventions is as follows:
 
@@ -163,11 +185,11 @@ _Table 3.5: Mapping between MVC and Django's MTV pattern._
 
 In Django, a "View" is a Python function or class that receives an HTTP request and returns an HTTP response (analogous to a Controller in traditional MVC). A "Template" is the HTML file that renders data for the user (analogous to a View in traditional MVC).
 
-![MTV Diagram](/images/unit-3/mtv.webp)
+![MTV Diagram](/images/mtv.webp)
 
 _Figure 3.3: Django's MTV (Model-Template-View) pattern._
 
-### 3.3.3 Setting Up a Django Development Environment
+### Setting Up a Django Development Environment
 
 The recommended workflow for setting up a Django project involves creating an isolated Python virtual environment, installing Django within it, and initialising the project in the current directory using the `.` (dot) syntax. This approach keeps the project directory structure clean and avoids creating a redundant nested folder.
 
@@ -242,7 +264,7 @@ challenges_project/          # Project root (created manually)
 
 _Listing 3.5: Directory structure of a newly created Django project with a virtual environment._
 
-### 3.3.4 Key Project Files
+### Key Project Files
 
 **`manage.py`** is the command-line utility for interacting with the Django project. Common commands include:
 
@@ -259,7 +281,7 @@ _Listing 3.6: Frequently used manage.py commands._
 
 **`urls.py`** (at the project level) defines the root URL routing table, mapping URL patterns to view functions or to application-level URL configurations.
 
-### 3.3.5 Setting Up the IDE
+### Setting Up the IDE
 
 The following Visual Studio Code extensions are recommended for Django development:
 
@@ -306,7 +328,7 @@ Configure djlint as the default formatter for Django HTML files in the VS Code w
 
 _Listing 3.9: Configuring djlint as the Django HTML formatter in VS Code._
 
-### 3.3.6 Starting the Development Server
+### Starting the Development Server
 
 ```bash
 # Start the development server (default port 8000)
@@ -342,7 +364,7 @@ _Listing 3.11: Terminal output when starting the Django development server for t
 
 Navigating to `http://127.0.0.1:8000/` in a browser displays Django's default welcome page, confirming that the project is configured correctly. The migration warning can be resolved by running `python manage.py migrate`.
 
-### 3.3.7 Django Apps
+### Django Apps
 
 A Django project is composed of one or more apps. An app is a self-contained module that implements a specific piece of functionality (e.g., a blog, user authentication, an e-commerce catalogue). This modular design promotes code reuse—an app developed for one project can be installed in another.
 
@@ -423,9 +445,9 @@ _Listing 3.15: Complete project structure with one registered app._
 
 ---
 
-## 3.4 URLs and Views
+## URLs and Views
 
-### 3.4.1 Routing in Django
+### Routing in Django
 
 Routing is the mechanism that maps incoming URLs to specific Python functions (views) that handle the request and produce a response. Django uses a URL dispatcher defined in `urls.py` files. The matching process works as follows:
 
@@ -437,7 +459,7 @@ Routing is the mechanism that maps incoming URLs to specific Python functions (v
 
 URLs map web addresses to views. Views are Python functions (or classes) that receive a web request and return a web response. Views contain the logic that processes requests.
 
-### 3.4.2 The Request Object
+### The Request Object
 
 Every view function receives a `request` object as its first argument. This object encapsulates all information about the incoming HTTP request:
 
@@ -449,7 +471,7 @@ Every view function receives a `request` object as its first argument. This obje
 - `request.user` — The currently authenticated user.
 - `request.session` — The session data dictionary.
 
-### 3.4.3 Handling HTTP Methods
+### Handling HTTP Methods
 
 A single view function can handle different HTTP methods by inspecting `request.method`:
 
@@ -467,7 +489,7 @@ def article_view(request):
 
 _Listing 3.16: Handling multiple HTTP methods in a single view._
 
-### 3.4.4 Query Parameters
+### Query Parameters
 
 Query parameters from the URL's query string are accessed through `request.GET`:
 
@@ -482,7 +504,7 @@ def search(request):
 
 _Listing 3.17: Accessing query parameters from the request._
 
-### 3.4.5 Creating Views and URL Configurations
+### Creating Views and URL Configurations
 
 The following walkthrough demonstrates the creation of views and URL patterns for a "Monthly Challenges" application.
 
@@ -529,7 +551,7 @@ _Listing 3.20: Including app-level URLs in the root URL configuration._
 
 With this configuration, navigating to `http://127.0.0.1:8000/challenges/` invokes the `index` view.
 
-### 3.4.6 Adding Multiple Views
+### Adding Multiple Views
 
 Additional views are defined in `views.py` and mapped to URL patterns in the app's `urls.py`:
 
@@ -553,7 +575,7 @@ urlpatterns = [
 
 _Listing 3.21: Multiple views and their corresponding URL patterns._
 
-### 3.4.7 Dynamic Path Segments and Path Converters
+### Dynamic Path Segments and Path Converters
 
 Django supports dynamic URL segments using angle-bracket syntax. The captured value is passed as a keyword argument to the view function:
 
@@ -590,7 +612,7 @@ path('<slug:title>/', views.post_detail),
 
 _Listing 3.23: URL patterns using path converters._
 
-### 3.4.8 Dynamic View Logic with Data Dictionaries
+### Dynamic View Logic with Data Dictionaries
 
 The following example demonstrates a view that serves different content based on the captured URL parameter:
 
@@ -623,7 +645,7 @@ def monthly_challenge(request, month):
 
 _Listing 3.24: A view using a dictionary to serve dynamic content based on the URL._
 
-### 3.4.9 Redirects
+### Redirects
 
 Django provides two mechanisms for redirecting users to a different URL:
 
@@ -645,7 +667,7 @@ def monthly_challenge_by_number(request, month):
 
 _Listing 3.25: Redirecting using HttpResponseRedirect and the redirect shortcut._
 
-### 3.4.10 The reverse() Function and Named URLs
+### The reverse() Function and Named URLs
 
 Hardcoding URLs in view functions is fragile—if a URL pattern changes, every reference must be updated manually. The `reverse()` function resolves a URL dynamically from its name, ensuring consistency:
 
@@ -661,7 +683,7 @@ def monthly_challenge_by_number(request, month):
 
 _Listing 3.26: Using reverse() with named URLs for dynamic URL resolution._
 
-### 3.4.11 Returning HTML from Views
+### Returning HTML from Views
 
 Views can return HTML content directly as strings, although this approach is suitable only for simple cases. For anything beyond trivial HTML, templates should be used (covered in Section 3.5):
 
@@ -685,9 +707,9 @@ While functional, embedding HTML strings within Python code mixes presentation w
 
 ---
 
-## 3.5 Templates and Static Files
+## Templates and Static Files
 
-### 3.5.1 Introduction to Templating
+### Introduction to Templating
 
 Templating is the process of generating dynamic HTML by combining a template (the HTML structure) with data from the view. Templates separate presentation from logic, adhering to Django's MTV architecture.
 
@@ -697,7 +719,7 @@ A Django template is a text file—typically HTML—that contains static content
 - **Template tags** with `{% tag %}` — Provides control flow logic (conditionals, loops).
 - **Filters** with `{{ variable|filter }}` — Transforms data for display (e.g., converting to uppercase, truncating text).
 
-### 3.5.2 JSON Responses
+### JSON Responses
 
 For API endpoints, views return JSON data instead of HTML. Django provides `JsonResponse` for this purpose:
 
@@ -729,7 +751,7 @@ The resulting HTTP response contains:
 }
 ```
 
-### 3.5.3 Adding and Registering Templates
+### Adding and Registering Templates
 
 Templates are stored within a conventional directory structure inside each app. Django's template loader requires a specific nested folder pattern to avoid naming conflicts between apps:
 
@@ -746,7 +768,7 @@ The inner `challenges/` folder prevents naming collisions when multiple apps con
 
 The app must be registered in `settings.py` (as shown in Listing 3.10) for Django's template engine to discover its templates.
 
-### 3.5.4 Rendering Templates
+### Rendering Templates
 
 Django provides two approaches for rendering templates.
 
@@ -785,7 +807,7 @@ def monthly_challenge(request, month):
 
 _Listing 3.31: Rendering a template using the render shortcut._
 
-### 3.5.5 Template Variable Interpolation
+### Template Variable Interpolation
 
 Data is passed from the view to the template as a dictionary (the template context). Within the template, variables are output using double curly braces `{{ }}`:
 
@@ -814,7 +836,7 @@ _Listing 3.32: Passing context variables to a template._
 
 The dictionary `{"text": challenge_text, "month_name": month.capitalize()}` constitutes the template context. The keys become variable names accessible within the template.
 
-### 3.5.6 Template Filters
+### Template Filters
 
 Filters transform the value of a variable for display purposes. They are applied using the pipe (`|`) syntax:
 
@@ -850,7 +872,7 @@ The `title` filter capitalises the first letter of each word, `truncatewords` li
 
 _Listing 3.34: Applying the title filter in a template._
 
-### 3.5.7 The for Tag — Looping in Templates
+### The for Tag — Looping in Templates
 
 The `{% for %}` tag iterates over a sequence, rendering its body once for each item. The `forloop` context variable provides iteration metadata such as `forloop.counter` (1-indexed iteration count).
 
@@ -880,7 +902,7 @@ def index(request):
 
 _Listing 3.35: Using the for tag to iterate over a list in a template._
 
-### 3.5.8 The url Tag — Dynamic URL Generation in Templates
+### The url Tag — Dynamic URL Generation in Templates
 
 Hardcoding URLs in templates is fragile. The `{% url %}` tag generates URLs dynamically from their registered names, ensuring that templates remain correct even if URL patterns change:
 
@@ -903,7 +925,7 @@ _Listing 3.36: Using the url tag for dynamic URL generation._
 
 The `{% url 'monthly-challenge' month %}` expression resolves to the URL pattern named `monthly-challenge`, passing `month` as the dynamic path argument.
 
-### 3.5.9 The if Tag — Conditional Rendering
+### The if Tag — Conditional Rendering
 
 The `{% if %}` tag conditionally includes or excludes content based on a Boolean expression:
 
@@ -930,7 +952,7 @@ monthly_challenges = {
 
 _Listing 3.37: Conditional rendering with the if tag._
 
-### 3.5.10 Template Inheritance
+### Template Inheritance
 
 Template inheritance is Django's mechanism for creating a consistent page layout across an application. A **base template** defines the overall structure and declares named blocks that child templates can override.
 
@@ -1019,7 +1041,7 @@ _Listing 3.41: Another child template overriding base blocks._
 
 The `{% extends "base.html" %}` directive must be the first tag in the child template. Each `{% block %}` in the child replaces the corresponding block in the base template.
 
-### 3.5.11 Including Partial Template Snippets
+### Including Partial Template Snippets
 
 The `{% include %}` tag inserts the content of another template file at the point of inclusion. This is useful for reusable UI components such as navigation headers and footers:
 
@@ -1060,7 +1082,7 @@ Included templates have access to all context variables available to the parent 
 
 _Listing 3.44: Passing extra variables to an included template._
 
-### 3.5.12 Custom 404 Templates
+### Custom 404 Templates
 
 Django allows custom error pages. To create a custom 404 page, place a `404.html` template in the global templates directory:
 
@@ -1102,7 +1124,7 @@ _Listing 3.46: Raising Http404 to trigger the custom 404 template._
 
 > **Note:** Custom error pages are displayed only when `DEBUG = False` in `settings.py`. During development (when `DEBUG = True`), Django shows its default debug error page. When setting `DEBUG = False`, you must also set `ALLOWED_HOSTS` (e.g., `ALLOWED_HOSTS = ['*']` for testing purposes).
 
-### 3.5.13 Static Files
+### Static Files
 
 Static files are assets that do not change dynamically—CSS stylesheets, JavaScript files, images, and fonts. Django provides a built-in static file serving system for development.
 
@@ -1157,7 +1179,7 @@ Then load the stylesheet in the child template:
 
 _Listing 3.49: Loading a static CSS file in a template._
 
-### 3.5.14 Global Static Files
+### Global Static Files
 
 Static files shared across multiple apps (such as a global stylesheet or a common JavaScript library) are placed in a project-level `static/` directory. This directory must be registered in `settings.py`:
 
@@ -1240,15 +1262,15 @@ This layered approach—a global stylesheet in the base template and app-specifi
 
 ---
 
-## 3.6 Data and Models
+## Data and Models
 
-### 3.6.1 Introduction to Object-Relational Mapping (ORM)
+### Introduction to Object-Relational Mapping (ORM)
 
 Object-Relational Mapping (ORM) is a programming technique that provides a bridge between a relational database and an object-oriented programming language. Instead of writing raw SQL queries, developers interact with the database through the language's native objects and methods. The ORM translates these high-level operations into the appropriate SQL statements automatically.
 
 The advantages of using an ORM are significant. First, developers write Python (or another host language) instead of SQL, which keeps the codebase uniform and easier to maintain. Second, ORM-generated queries are database-agnostic—the same Python code can target SQLite during development and PostgreSQL in production without modification. Third, the ORM automatically parameterises queries, providing built-in protection against SQL injection attacks. Finally, an object-oriented interface to the database is inherently more readable and more consistent with the rest of the application code.
 
-![Class to Table Mapping](/images/unit-3/class-to-table-mapping.webp)
+![Class to Table Mapping](/images/class-to-table-mapping.webp)
 
 _Figure 3.4: Mapping between Python classes and relational database tables in an ORM._
 
@@ -1259,7 +1281,7 @@ Django supports several database backends:
 - **MySQL** — Widely used in the web hosting industry.
 - **Oracle** — Used in enterprise environments.
 
-### 3.6.2 Django's Built-In ORM
+### Django's Built-In ORM
 
 Django includes a powerful ORM as part of its "batteries included" philosophy. Models are defined as Python classes that inherit from `django.db.models.Model`. Each class maps to a database table, and each class attribute maps to a table column.
 
@@ -1310,7 +1332,7 @@ CREATE TABLE book_outlet_book (
 
 _Listing 3.58: SQL equivalent of the Book model._
 
-### 3.6.3 Common Model Field Types
+### Common Model Field Types
 
 Django provides a comprehensive set of field types, each mapping to an appropriate database column type.
 
@@ -1330,7 +1352,7 @@ _Table 3.7: Common Django model field types._
 | `ForeignKey`      | Many-to-one relationship         | `author = ForeignKey(Author)`         |
 | `ManyToManyField` | Many-to-many relationship        | `tags = ManyToManyField(Tag)`         |
 
-### 3.6.4 Field Options
+### Field Options
 
 Field options are keyword arguments passed to field constructors to control their behaviour at both the database and form levels.
 
@@ -1349,7 +1371,7 @@ _Table 3.8: Common field options._
 
 > **Note:** `null=True` and `blank=True` serve different purposes. `null` controls the database constraint (whether a NULL value is permitted in the column), while `blank` controls form validation (whether the field may be left empty when submitting a form). For string-based fields, Django convention is to use `blank=True` with `default=""` rather than `null=True`, because Django stores empty strings rather than NULL for text fields.
 
-### 3.6.5 Migrations
+### Migrations
 
 After defining or modifying models, the changes must be propagated to the database through Django's migration system. Migrations are version-controlled files that describe incremental changes to the database schema.
 
@@ -1371,7 +1393,7 @@ The migration workflow performs the following operations:
 4. **Application** — Running `migrate` executes the pending migration files against the database, altering its schema accordingly.
 5. **Reversal** — Migrations can be reversed to undo schema changes, which is useful during development.
 
-### 3.6.6 CRUD Operations via the Django Shell
+### CRUD Operations via the Django Shell
 
 The Django interactive shell provides a convenient environment for performing database operations directly. It is invoked with:
 
@@ -1464,7 +1486,7 @@ python manage.py migrate
 
 _Listing 3.67: Regenerating migrations after model changes._
 
-### 3.6.7 Retrieving Data — get, filter, and QuerySet Methods
+### Retrieving Data — get, filter, and QuerySet Methods
 
 The Django ORM provides several methods for querying data with varying levels of specificity.
 
@@ -1508,7 +1530,7 @@ _Table 3.9: Summary of common QuerySet methods._
 | `values()`   | Returns dictionaries instead of model instances                             |
 | `distinct()` | Removes duplicate rows from the result                                      |
 
-### 3.6.8 Lookup Expressions (Field Lookups)
+### Lookup Expressions (Field Lookups)
 
 Django's field lookups enable comparison operators within queries. Lookups are appended to field names using double underscores (`__`):
 
@@ -1543,7 +1565,7 @@ _Table 3.10: Django field lookup expressions._
 | `in`         | In a list of values       | `filter(id__in=[1, 2, 3])`          |
 | `isnull`     | Is NULL                   | `filter(bio__isnull=True)`          |
 
-### 3.6.9 Complex Queries with Q Objects
+### Complex Queries with Q Objects
 
 By default, multiple keyword arguments passed to `filter()` are combined with AND logic. To construct OR queries or negate conditions, Django provides the `Q` object from `django.db.models`:
 
@@ -1573,7 +1595,7 @@ Book.objects.filter(rating__lt=3, title__icontains="story")
 
 _Listing 3.72: Case-insensitive filtering with icontains._
 
-### 3.6.10 QuerySet Chaining, Lazy Evaluation, Ordering, and Aggregation
+### QuerySet Chaining, Lazy Evaluation, Ordering, and Aggregation
 
 **Lazy evaluation.** QuerySets are lazily evaluated—Django does not execute a database query until the QuerySet is actually consumed (e.g., iterated over, sliced, printed, or converted to a list). This allows queries to be chained and refined without incurring additional database hits:
 
@@ -1611,7 +1633,7 @@ Book.objects.aggregate(total=Count('id'))
 
 _Listing 3.75: Aggregate queries using Avg and Count._
 
-### 3.6.11 Integrating Models with Views and Templates
+### Integrating Models with Views and Templates
 
 With models and CRUD operations understood, the next step is to connect the data layer to the presentation layer. The following walkthrough demonstrates how to build a book catalogue that lists all books and provides a detail page for each.
 
@@ -1681,8 +1703,13 @@ _Listing 3.78: Index template listing all books with links to detail pages._
 ```python
 # book_outlet/views.py
 from django.shortcuts import get_object_or_404, render
+# from django.http import Http404
 
 def book_detail(request, id):
+    # try:
+    #     book = Book.objects.get(pk=id)
+    # except:
+    #     raise Http404()
     book = get_object_or_404(Book, pk=id)
     return render(request, "book_outlet/book_detail.html", {
         "title": book.title,
@@ -1750,9 +1777,9 @@ This example demonstrates the complete data flow in Django's MTV architecture: t
 
 ---
 
-## 3.7 The Django Admin Interface
+## The Django Admin Interface
 
-### 3.7.1 Creating a Superuser
+### Creating a Superuser
 
 Django includes a built-in administration interface that provides a web-based GUI for managing application data. Before accessing the admin panel, a superuser account must be created:
 
@@ -1764,7 +1791,7 @@ _Listing 3.82: Creating an admin superuser._
 
 The command prompts for a username, email address, and password. Once the superuser is created, start the development server and navigate to `http://127.0.0.1:8000/admin/` in a browser to access the admin panel.
 
-### 3.7.2 Registering Models
+### Registering Models
 
 By default, the admin panel only displays Django's built-in models (Users, Groups). To manage custom models through the admin interface, they must be explicitly registered in the app's `admin.py` file:
 
@@ -1780,7 +1807,7 @@ _Listing 3.83: Registering the Book model with the admin site._
 
 After refreshing the admin panel, the `Book` model appears under the app's section, providing a full CRUD interface for managing book records.
 
-### 3.7.3 Customising the Admin Panel
+### Customising the Admin Panel
 
 The default admin interface can be customised by creating a `ModelAdmin` subclass. Common customisations include filtering options, column display, and search functionality:
 
@@ -1803,9 +1830,9 @@ The `list_filter` attribute adds filtering widgets to the sidebar, `list_display
 
 ---
 
-## 3.8 Forms
+## Forms
 
-### 3.8.1 HTML Forms and HTTP Methods
+### HTML Forms and HTTP Methods
 
 HTML forms are the primary mechanism through which users submit data to a web server. A form collects user input—text, selections, file uploads—and transmits it to the server for processing.
 
@@ -1840,7 +1867,7 @@ _Listing 3.85: A basic HTML form with CSRF protection._
 
 The key attributes of the `<form>` element are `method` (the HTTP method), `action` (the URL to which the data is sent), and `name` on each input field (the key used to access the submitted data on the server).
 
-### 3.8.2 Processing Form Data in Django
+### Processing Form Data in Django
 
 **Accessing POST data.** When a form is submitted via POST, the submitted values are available through the `request.POST` dictionary-like object:
 
@@ -1881,7 +1908,7 @@ _Table 3.12: Methods for accessing form data._
 | `request.POST['field']`                | Returns the value; raises `KeyError` if missing          |
 | `request.POST.getlist('field')`        | Returns a list of values (for checkboxes, multi-selects) |
 
-### 3.8.3 CSRF Protection
+### CSRF Protection
 
 Cross-Site Request Forgery (CSRF) is a class of attack in which a malicious website tricks a user's browser into submitting a request to another site where the user is authenticated. Consider the following attack scenario:
 
@@ -1920,7 +1947,7 @@ The `{% csrf_token %}` tag renders a hidden input field containing the token:
 
 _Listing 3.89: HTML output of the csrf_token template tag._
 
-### 3.8.4 The Django Forms API
+### The Django Forms API
 
 While it is possible to build forms using raw HTML and process the submitted data manually, Django provides a Forms API that automates form rendering, validation, and error handling.
 
@@ -2004,7 +2031,7 @@ _Listing 3.91: Processing a Django form in a view._
 
 _Listing 3.92: Form rendering options in templates._
 
-### 3.8.5 Form Fields, Field Arguments, and Widgets
+### Form Fields, Field Arguments, and Widgets
 
 **Common form field types.** Django provides field types that map to corresponding HTML input elements:
 
@@ -2082,7 +2109,7 @@ _Listing 3.94: Customising field rendering with widgets._
 
 The `attrs` dictionary adds HTML attributes (such as `class`, `placeholder`, and `type`) to the rendered input element.
 
-### 3.8.6 Form Validation
+### Form Validation
 
 Validation occurs when `form.is_valid()` is called. Django performs validation in three stages:
 
@@ -2134,7 +2161,7 @@ _Listing 3.96: Cross-field validation in the clean method._
 
 _Listing 3.97: Displaying non-field validation errors in a template._
 
-### 3.8.7 Comprehensive Form Validation — A Complete Walkthrough
+### Comprehensive Form Validation — A Complete Walkthrough
 
 This section presents a complete registration form application that demonstrates server-side validation for a variety of input types. The form collects a user's name, gender, hobbies, appointment date and time, country, résumé file, email, phone number, password, and password confirmation. The validation requirements are as follows:
 
@@ -2577,9 +2604,9 @@ Navigate to `http://127.0.0.1:8000/registration/` to test the registration form.
 
 ---
 
-## 3.9 Sessions and Cookies
+## Sessions and Cookies
 
-### 3.9.1 Cookies
+### Cookies
 
 HTTP is a stateless protocol—each request is independent and carries no memory of previous interactions. Cookies provide one mechanism for maintaining state across requests. A cookie is a small piece of data (up to approximately 4 KB) that the server sends to the client's browser. The browser stores the cookie and automatically includes it in every subsequent request to the same domain.
 
@@ -2591,7 +2618,7 @@ Key characteristics of cookies:
 - Can be configured with an expiration date or a maximum age.
 - Limited to approximately 4 KB per cookie.
 
-### 3.9.2 Cookie Attributes
+### Cookie Attributes
 
 _Table 3.15: Standard cookie attributes._
 
@@ -2606,7 +2633,7 @@ _Table 3.15: Standard cookie attributes._
 | `HttpOnly`   | Prevents JavaScript from accessing the cookie (mitigates XSS)      |
 | `SameSite`   | Controls cross-site request behaviour (`Strict`, `Lax`, or `None`) |
 
-### 3.9.3 Working with Cookies in Django
+### Working with Cookies in Django
 
 **Setting cookies.** Cookies are set on the response object using the `set_cookie()` method. The `max_age` parameter specifies the cookie's lifetime in seconds:
 
@@ -2673,7 +2700,7 @@ def delete_cookie(request):
 
 _Listing 3.110: Deleting a cookie._
 
-### 3.9.4 Sessions
+### Sessions
 
 While cookies store data on the client, sessions store data on the server. A session associates a unique identifier (the session ID) with server-side data. The session ID itself is stored in a cookie on the client's browser and is sent with every request, allowing the server to retrieve the corresponding data.
 
@@ -2684,7 +2711,7 @@ Common use cases for sessions include:
 - Remembering user preferences and settings.
 - Tracking progress through multi-step forms (wizards).
 
-### 3.9.5 How Sessions Work
+### How Sessions Work
 
 The session workflow proceeds as follows:
 
@@ -2697,7 +2724,7 @@ The session workflow proceeds as follows:
 
 Django enables sessions by default. The `django.contrib.sessions` app and `SessionMiddleware` are included in new projects automatically.
 
-### 3.9.6 Session Configuration
+### Session Configuration
 
 Session behaviour can be customised in `settings.py`:
 
@@ -2713,7 +2740,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 _Listing 3.111: Configuring session settings._
 
-### 3.9.7 Using Sessions in Django
+### Using Sessions in Django
 
 **Storing data in a session:**
 
@@ -2746,7 +2773,7 @@ _Table 3.16: Django session methods._
 | `request.session.flush()`             | Clear all session data                      |
 | `request.session.set_expiry(seconds)` | Set the session expiration time             |
 
-### 3.9.8 Sessions versus Cookies
+### Sessions versus Cookies
 
 _Table 3.17: Comparison of cookies and sessions._
 
@@ -2762,9 +2789,9 @@ _Table 3.17: Comparison of cookies and sessions._
 
 ---
 
-## 3.10 Authentication and Authorisation
+## Authentication and Authorisation
 
-### 3.10.1 Authentication versus Authorisation
+### Authentication versus Authorisation
 
 Authentication and authorisation are related but distinct security concepts:
 
@@ -2777,7 +2804,7 @@ _Table 3.18: Authentication versus authorisation._
 
 Authentication must occur before authorisation—a user's identity must be established before the system can determine what actions they are permitted to perform.
 
-### 3.10.2 The Authentication Flow
+### The Authentication Flow
 
 A typical authentication flow proceeds as follows:
 
@@ -2788,7 +2815,7 @@ A typical authentication flow proceeds as follows:
 5. The client includes the session cookie in all subsequent requests.
 6. The server verifies the session on each request to confirm the user's identity.
 
-### 3.10.3 Implementing a Login System — A Complete Walkthrough
+### Implementing a Login System — A Complete Walkthrough
 
 The following walkthrough demonstrates a custom login system using Django sessions and hashed passwords. The application includes login, dashboard, logout, and registration functionality.
 
@@ -2966,7 +2993,7 @@ _Listing 3.119: Creating a test user with a hashed password via the Django shell
 
 Navigate to `http://127.0.0.1:8000/auth/login/` to test the login functionality.
 
-### 3.10.4 Adding a Registration View
+### Adding a Registration View
 
 A registration view allows new users to create accounts through the web interface rather than through the Django shell:
 
@@ -3088,11 +3115,11 @@ _Listing 3.122: Updated URL configuration with registration._
 
 ---
 
-## 3.11 Practical Exercises
+## Practical Exercises
 
 This section presents a collection of practical exercises that consolidate the concepts covered in Sections 3.6 through 3.10. Each exercise specifies a problem statement, validation requirements, and a complete solution comprising the model, form, view, template, and URL configuration.
 
-### 3.11.1 Exercise: Patient Registration Form
+### Exercise: Patient Registration Form
 
 **Problem statement.** Create a server-side script to validate and store patient data into a `patients` table with the following fields: name, patient ID, mobile number, gender, address, date of birth, and doctor name. The validation rules are:
 
@@ -3347,7 +3374,7 @@ urlpatterns = [
 
 _Listing 3.128: URL configurations for the patient app._
 
-### 3.11.2 Exercise: User Registration with Username and Password Validation
+### Exercise: User Registration with Username and Password Validation
 
 **Problem statement.** Design a registration form and write the corresponding server-side code to store user data after satisfying the following validation rules:
 
@@ -3581,7 +3608,7 @@ urlpatterns = [
 
 _Listing 3.134: URL configurations for the user app._
 
-### 3.11.3 Exercise: File Upload with Validation
+### Exercise: File Upload with Validation
 
 **Problem statement.** Write a Django view to upload a file and validate:
 
@@ -3776,7 +3803,7 @@ _Listing 3.141: Media settings for file uploads._
 
 ---
 
-### 3.11.4 Exercise: Project File Submission
+### Exercise: Project File Submission
 
 **Problem statement.** Design a form to upload and submit a student project file into a database. The form fields are: TU Registration Number, Email Address, and Project File. The validation rules are:
 
@@ -3994,9 +4021,9 @@ _Listing 3.147: URL and media configurations for the project submission app._
 
 ---
 
-## 3.12 Middleware
+## Middleware
 
-### 3.12.1 What Is Middleware?
+### What Is Middleware?
 
 Middleware is a layer of software that sits between the incoming HTTP request and the outgoing HTTP response, processing each as it flows through the Django application. Middleware components form a chain—each request passes through every middleware in order before reaching the view, and each response passes back through the same chain in reverse order.
 
@@ -4020,7 +4047,7 @@ _Table 3.19: Common middleware use cases._
 | **Session Management** | Read and write session data                         |
 | **Error Handling**     | Catch exceptions and produce custom error responses |
 
-### 3.12.2 Django's Built-In Middleware
+### Django's Built-In Middleware
 
 Django ships with several middleware classes enabled by default in `settings.py`. Each serves a specific purpose:
 
@@ -4053,7 +4080,7 @@ _Listing 3.148: Django's default middleware stack with annotations._
 
 > **Important:** The order of middleware in the `MIDDLEWARE` list matters. Middleware is processed top-to-bottom for requests and bottom-to-top for responses. For example, `SecurityMiddleware` should be near the top to ensure security headers are added to all responses, while `AuthenticationMiddleware` must come after `SessionMiddleware` because it depends on session data.
 
-### 3.12.3 Creating Custom Middleware
+### Creating Custom Middleware
 
 Django supports function-based middleware. A function-based middleware is a callable that accepts a `get_response` callable and returns a middleware function:
 
@@ -4113,7 +4140,7 @@ When a request is processed, the terminal displays output such as:
 
 _Listing 3.151: Terminal output from the request timing middleware._
 
-### 3.12.4 Error Handling Middleware
+### Error Handling Middleware
 
 A more advanced middleware example intercepts exceptions raised by views and returns structured JSON error responses instead of Django's default error pages:
 
@@ -4209,15 +4236,15 @@ _Listing 3.155: Middleware stack with both custom middleware components._
 
 ---
 
-## 3.13 Comparison of Backend Frameworks
+## Comparison of Backend Frameworks
 
-### 3.13.1 What Is a Web Framework?
+### What Is a Web Framework?
 
 A web framework is a software library designed to support the development of web applications. It provides pre-built components for common tasks (routing, database access, authentication), a structure and set of conventions for organising code, tools for handling HTTP requests and responses, database integration, security features, and development utilities (development servers, debugging tools, migration systems).
 
 Using a framework saves development time, enforces best practices, and reduces the likelihood of security vulnerabilities.
 
-### 3.13.2 Types of Web Frameworks
+### Types of Web Frameworks
 
 _Table 3.20: Categories of web frameworks._
 
@@ -4227,7 +4254,7 @@ _Table 3.20: Categories of web frameworks._
 | **Micro**      | Minimal core; developers add extensions as needed | Flask, Express.js      |
 | **API-First**  | Optimised for building APIs                       | FastAPI, .NET Web API  |
 
-### 3.13.3 Django (Python)
+### Django (Python)
 
 Django is a full-stack framework following the "batteries included" philosophy. It ships with a built-in admin panel, ORM, authentication system, form handling, template engine, CSRF/XSS protection, URL routing, and middleware support.
 
@@ -4243,7 +4270,7 @@ _Table 3.21: Django — advantages and disadvantages._
 | Excellent official documentation            |                                              |
 | Large, active community                     |                                              |
 
-### 3.13.4 Flask (Python)
+### Flask (Python)
 
 Flask is a micro framework with a minimal core and maximum flexibility. It provides Jinja2 templating and the Werkzeug WSGI toolkit but does not include an ORM, form validation, or admin panel—these are added through extensions (e.g., SQLAlchemy, WTForms).
 
@@ -4258,7 +4285,7 @@ _Table 3.22: Flask — advantages and disadvantages._
 | Lightweight footprint                | No built-in admin, forms, or ORM        |
 | Explicit code with no hidden "magic" |                                         |
 
-### 3.13.5 FastAPI (Python)
+### FastAPI (Python)
 
 FastAPI is an API-first micro framework designed for speed, modern Python features, and automatic documentation. It supports native async/await, automatic API documentation (Swagger/OpenAPI), type-hint-based validation, dependency injection, and OAuth2.
 
@@ -4273,7 +4300,7 @@ _Table 3.23: FastAPI — advantages and disadvantages._
 | Automatic Swagger UI documentation           | Async code can be harder to debug          |
 | Automatic request validation from type hints |                                            |
 
-### 3.13.6 ASP.NET Core MVC (C#/.NET)
+### ASP.NET Core MVC (C#/.NET)
 
 ASP.NET Core is a full-stack, cross-platform framework built on .NET Core. It features MVC architecture, Entity Framework ORM, Razor templating, dependency injection, strong typing, and the Identity system for authentication.
 
@@ -4288,7 +4315,7 @@ _Table 3.24: ASP.NET Core — advantages and disadvantages._
 | Excellent Visual Studio tooling  | Some tools require licences         |
 | Compile-time type safety         |                                     |
 
-### 3.13.7 Ruby on Rails (Ruby)
+### Ruby on Rails (Ruby)
 
 Ruby on Rails is a full-stack framework following the "convention over configuration" philosophy. It features MVC architecture, Active Record ORM, scaffold generation, database migrations, an asset pipeline, and Action Cable for WebSockets.
 
@@ -4303,7 +4330,7 @@ _Table 3.25: Ruby on Rails — advantages and disadvantages._
 | Clean, readable Ruby syntax             | Requires learning the Ruby language |
 | Mature ecosystem (20+ years)            |                                     |
 
-### 3.13.8 Spring Boot (Java)
+### Spring Boot (Java)
 
 Spring Boot is a full-stack framework that simplifies enterprise Java development. It provides standalone applications, embedded servers, auto-configuration, the Spring ecosystem (Security, Data JPA), and dependency injection.
 
@@ -4318,7 +4345,7 @@ _Table 3.26: Spring Boot — advantages and disadvantages._
 | JVM performance optimisation        | JVM memory overhead           |
 | Massive community support           |                               |
 
-### 3.13.9 Express.js (JavaScript/Node.js)
+### Express.js (JavaScript/Node.js)
 
 Express.js is a minimalist, unopinionated micro framework for Node.js. It provides JavaScript on the server, non-blocking I/O, the npm ecosystem, middleware-based architecture, template engine support, and WebSocket support.
 
@@ -4333,7 +4360,7 @@ _Table 3.27: Express.js — advantages and disadvantages._
 | Excellent for real-time and streaming              | Single-threaded; CPU-intensive tasks block |
 | Fast V8 engine with non-blocking I/O               |                                            |
 
-### 3.13.10 Framework Comparison
+### Framework Comparison
 
 _Table 3.28: Side-by-side comparison of popular backend frameworks._
 
@@ -4348,7 +4375,7 @@ _Table 3.28: Side-by-side comparison of popular backend frameworks._
 | **Async**       | Limited   | Limited   | Native    | Native         | No     | Yes         | Native     |
 | **Used By**     | Instagram | Netflix   | Microsoft | Stack Overflow | GitHub | Alibaba     | Netflix    |
 
-### 3.13.11 Choosing the Right Framework
+### Choosing the Right Framework
 
 _Table 3.29: Framework recommendations by project type._
 
@@ -4364,13 +4391,13 @@ _Table 3.29: Framework recommendations by project type._
 
 ---
 
-## 3.14 Database Types
+## Database Types
 
-### 3.14.1 What Is a Database?
+### What Is a Database?
 
 A database is an organised collection of structured data stored electronically. Databases enable applications to store data permanently, retrieve data efficiently, update and delete data, maintain data integrity through constraints, and handle concurrent access from multiple users.
 
-### 3.14.2 Relational Databases (SQL)
+### Relational Databases (SQL)
 
 Relational databases store data in tables consisting of rows and columns. Tables can be related to one another through keys (primary keys and foreign keys). Relational databases use SQL (Structured Query Language) for data manipulation and are ACID compliant (Atomicity, Consistency, Isolation, Durability), ensuring reliable transactions.
 
@@ -4407,7 +4434,7 @@ _Table 3.30: Popular relational databases._
 
 _Listing 3.156: Visual representation of a relational database table._
 
-### 3.14.3 NoSQL Databases
+### NoSQL Databases
 
 NoSQL databases store data in flexible formats other than traditional tables. They are designed for scalability and handling unstructured or semi-structured data.
 
@@ -4445,7 +4472,7 @@ Key characteristics:
 
 _Listing 3.157: A MongoDB document illustrating the flexible, nested structure of a document database._
 
-### 3.14.4 Relational versus NoSQL — Comparison
+### Relational versus NoSQL — Comparison
 
 _Table 3.32: Comparison of relational and NoSQL databases._
 
@@ -4463,7 +4490,7 @@ _Table 3.32: Comparison of relational and NoSQL databases._
 
 **Choose a NoSQL database when:** the schema is evolving or unknown, horizontal scaling is required, handling large volumes of data, data is semi-structured or unstructured, and speed is more important than strict consistency.
 
-### 3.14.5 CRUD — The Four Fundamental Database Operations
+### CRUD — The Four Fundamental Database Operations
 
 CRUD represents the four basic operations for persistent storage:
 
@@ -4498,11 +4525,11 @@ _Listing 3.158: CRUD operations using raw SQL._
 
 ---
 
-## 3.15 Building a Complete CRUD Application
+## Building a Complete CRUD Application
 
 This section presents a comprehensive, optimised CRUD (Create, Read, Update, Delete) application that integrates the concepts covered throughout this chapter: project setup, models, forms with validation, views, template inheritance, static files, the admin interface, and middleware. The application is a notes manager built from scratch.
 
-### 3.15.1 Project Setup
+### Project Setup
 
 **Installing Python and Django:**
 
@@ -4537,7 +4564,7 @@ python manage.py startapp notes
 
 _Listing 3.160: Creating the CRUD project and the notes app._
 
-### 3.15.2 Model Definition
+### Model Definition
 
 Register the app in `settings.py`:
 
@@ -4606,7 +4633,7 @@ exit()
 
 _Listing 3.165: Creating sample notes via the Django shell._
 
-### 3.15.3 Form with Validation
+### Form with Validation
 
 The form class encapsulates validation logic and provides helper methods for creating and updating model instances:
 
@@ -4647,7 +4674,7 @@ class NoteForm(forms.Form):
 
 _Listing 3.166: NoteForm with custom validation and create/update helper methods._
 
-### 3.15.4 CRUD Views
+### CRUD Views
 
 ```python
 # notes/views.py
@@ -4706,7 +4733,7 @@ def delete_note(request, note_id):
 
 _Listing 3.167: Complete CRUD views using the NoteForm._
 
-### 3.15.5 Static Files
+### Static Files
 
 Create a CSS stylesheet for the app:
 
@@ -4751,7 +4778,7 @@ STATICFILES_DIRS = [
 
 _Listing 3.169: Static file configuration._
 
-### 3.15.6 Templates with Inheritance
+### Templates with Inheritance
 
 **Navigation partial** (`notes/templates/notes/partials/navigation.html`):
 
@@ -4876,7 +4903,7 @@ _Listing 3.173: Add note template using form rendering._
 
 _Listing 3.174: Edit note template._
 
-### 3.15.7 URL Configuration
+### URL Configuration
 
 ```python
 # notes/urls.py
@@ -4914,7 +4941,7 @@ python manage.py runserver
 
 _Listing 3.176: Starting the development server._
 
-### 3.15.8 Admin Registration
+### Admin Registration
 
 Create a superuser and register the model with the admin site:
 
@@ -4938,9 +4965,9 @@ Navigate to `http://127.0.0.1:8000/admin` to access the admin panel.
 
 ---
 
-## 3.16 Testing
+## Testing
 
-### 3.16.1 Automated Unit Testing
+### Automated Unit Testing
 
 Unit testing verifies that individual functions or methods work correctly in isolation, independent of other components. Django includes a test framework built on Python's `unittest` module. Tests are defined as classes that inherit from `django.test.TestCase` and contain methods whose names begin with `test_`.
 
@@ -4981,7 +5008,7 @@ OK
 
 _Listing 3.181: Running Django tests and expected output._
 
-### 3.16.2 Integration Testing
+### Integration Testing
 
 Integration testing verifies that multiple components—such as URLs, views, models, and templates—work together correctly as a whole. Django's test client allows testing views without starting a web server. The following tests verify that the homepage renders correctly and that the note creation and validation logic work as expected:
 
@@ -5038,7 +5065,7 @@ OK
 
 _Listing 3.183: Output after running all four tests._
 
-### 3.16.3 Continuous Integration with GitHub Actions
+### Continuous Integration with GitHub Actions
 
 GitHub Actions automates the testing process by running tests on every push to the repository. Create a workflow file:
 
@@ -5090,9 +5117,9 @@ Once pushed, every commit to the `main` branch triggers the workflow. GitHub cre
 
 ---
 
-## 3.17 Deployment
+## Deployment
 
-### 3.17.1 Deploying on Render
+### Deploying on Render
 
 Render is a cloud platform that supports automatic deployments from a Git repository. The following steps configure the CRUD application for production deployment.
 
@@ -5198,13 +5225,13 @@ _Listing 3.192: Render blueprint configuration._
 
 ---
 
-## 3.18 UI Testing with Selenium
+## UI Testing with Selenium
 
-### 3.18.1 Introduction to Selenium
+### Introduction to Selenium
 
 Selenium is a browser automation framework that enables developers to write tests that interact with a web application through a real browser. Unlike Django's built-in test client (which simulates HTTP requests without rendering), Selenium tests execute JavaScript, render the DOM, and simulate user interactions such as clicking buttons and filling in forms.
 
-### 3.18.2 Writing Selenium Tests
+### Writing Selenium Tests
 
 Install Selenium and pytest:
 
@@ -5271,7 +5298,7 @@ _Listing 3.195: Running Selenium tests with pytest._
 
 > **Note:** The `time.sleep(2)` calls are a simple but crude approach to waiting for page loads. In production test suites, explicit waits using `WebDriverWait` and expected conditions are preferred, as they are both faster and more reliable.
 
-### 3.18.3 Selenium Test for a Static HTML Page
+### Selenium Test for a Static HTML Page
 
 Selenium can also test simple HTML pages served by any web server. Consider a static login form:
 
@@ -5323,9 +5350,9 @@ _Listing 3.197: Selenium test for the static login form._
 
 ---
 
-## 3.19 Common Web Security Vulnerabilities
+## Common Web Security Vulnerabilities
 
-### 3.19.1 Cross-Site Scripting (XSS)
+### Cross-Site Scripting (XSS)
 
 Cross-Site Scripting (XSS) is a security vulnerability that allows attackers to inject malicious scripts into web pages viewed by other users. When a victim visits the compromised page, the injected script executes in their browser with the same privileges as legitimate scripts from the trusted website, potentially stealing cookies, session tokens, or other sensitive data.
 
@@ -5354,7 +5381,7 @@ The script will execute in every user's browser when they view the note. Django'
 
 > **Important:** Never use the `|safe` filter or `{% autoescape off %}` on user-supplied content. Django's auto-escaping is a critical defence against XSS attacks.
 
-### 3.19.2 SQL Injection
+### SQL Injection
 
 SQL injection is a code injection technique that exploits applications which construct SQL queries using unsanitised user input. It allows attackers to read, modify, or delete data in the database.
 
@@ -5412,7 +5439,7 @@ An even more destructive payload can drop the entire table:
 
 > **Important:** Never construct SQL queries using string formatting or interpolation with user input. Always use Django's ORM (`Note.objects.create(...)`) or parameterised queries (`cursor.execute("INSERT INTO ... VALUES (%s, %s)", [title, desc])`) to prevent SQL injection.
 
-### 3.19.3 Cross-Site Request Forgery (CSRF)
+### Cross-Site Request Forgery (CSRF)
 
 Cross-Site Request Forgery (CSRF) is an attack that forces authenticated users to submit unwanted requests to a web application. It exploits the trust that a website has in the user's browser—specifically, the fact that the browser automatically includes cookies (including session cookies) with every request to a domain.
 
