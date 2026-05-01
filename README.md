@@ -52,7 +52,7 @@ The Controller is the "traffic controller" of the application, directing the flo
 
 ![MVC Diagram](/images/mvc.webp)
 
-_Figure 3.1: The MVC architectural pattern showing the interaction between Model, View, and Controller._
+_Figure: The MVC architectural pattern showing the interaction between Model, View, and Controller._
 
 ### The Request-Response Cycle in MVC
 
@@ -72,7 +72,7 @@ The following sequence describes how a typical request is processed in an MVC ap
 
 ### Benefits of MVC
 
-_Table 3.1: Benefits of the MVC architectural pattern._
+_Table: Benefits of the MVC architectural pattern._
 
 | Benefit                    | Description                                                              |
 | :------------------------- | :----------------------------------------------------------------------- |
@@ -88,7 +88,7 @@ _Table 3.1: Benefits of the MVC architectural pattern._
 
 Different web frameworks implement the MVC pattern with varying terminology, but the core principle of separation of concerns remains consistent.
 
-_Table 3.2: MVC implementations in popular web frameworks._
+_Table: MVC implementations in popular web frameworks._
 
 | Framework     | Language   | MVC Implementation           |
 | :------------ | :--------- | :--------------------------- |
@@ -111,7 +111,7 @@ While the frontend is what users interact with—buttons, forms, visual layout�
 
 ### Frontend versus Backend
 
-_Table 3.3: Comparison of frontend and backend responsibilities._
+_Table: Comparison of frontend and backend responsibilities._
 
 | Frontend                                           | Backend                                                     |
 | :------------------------------------------------- | :---------------------------------------------------------- |
@@ -127,7 +127,7 @@ _Table 3.3: Comparison of frontend and backend responsibilities._
 
 ![HTTP](/images/http.webp)
 
-_Figure 3.2: HTTP request-response communication between client and server._
+_Figure: HTTP request-response communication between client and server._
 
 **Routing:** Routing is the mechanism by which the server determines which code should execute based on the requested URL. It maps URL patterns to specific handler functions:
 
@@ -164,7 +164,7 @@ Django is a high-level Python web framework designed for the rapid development o
 - **Rapid development** — Django's conventions and built-in tools dramatically accelerate the development cycle.
 - **Security first** — Django provides built-in protection against common web vulnerabilities including SQL injection, XSS, CSRF, and clickjacking.
 
-_Table 3.4: Key features of Django and their benefits._
+_Table: Key features of Django and their benefits._
 
 | Feature                             | Benefit                                      |
 | :---------------------------------- | :------------------------------------------- |
@@ -179,7 +179,7 @@ _Table 3.4: Key features of Django and their benefits._
 
 Django implements the MVC pattern using its own terminology: MTV (Model-Template-View). The correspondence between the two naming conventions is as follows:
 
-_Table 3.5: Mapping between MVC and Django's MTV pattern._
+_Table: Mapping between MVC and Django's MTV pattern._
 
 | MVC        | Django MTV   | Responsibility                      |
 | :--------- | :----------- | :---------------------------------- |
@@ -191,7 +191,7 @@ In Django, a "View" is a Python function or class that receives an HTTP request 
 
 ![MTV Diagram](/images/mtv.webp)
 
-_Figure 3.3: Django's MTV (Model-Template-View) pattern._
+_Figure: Django's MTV (Model-Template-View) pattern._
 
 ### Setting Up a Django Development Environment
 
@@ -206,7 +206,7 @@ python --version
 python3 --version
 ```
 
-_Listing 3.1: Verifying the Python installation._
+_Listing: Verifying the Python installation._
 
 **Step 2: Create a Project Directory and Virtual Environment**
 
@@ -227,7 +227,7 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-_Listing 3.2: Creating and activating a Python virtual environment._
+_Listing: Creating and activating a Python virtual environment._
 
 When the virtual environment is active, the terminal prompt is prefixed with `(venv)`, indicating that all subsequent Python and pip commands operate within the isolated environment.
 
@@ -239,7 +239,7 @@ pip install django
 django-admin --version
 ```
 
-_Listing 3.3: Installing Django within the virtual environment._
+_Listing: Installing Django within the virtual environment._
 
 **Step 4: Create a Django Project in the Current Directory**
 
@@ -248,7 +248,7 @@ _Listing 3.3: Installing Django within the virtual environment._
 django-admin startproject challenges_project .
 ```
 
-_Listing 3.4: Creating a Django project in the current directory._
+_Listing: Creating a Django project in the current directory._
 
 The trailing dot (`.`) instructs Django to place the project configuration package and `manage.py` directly in the current directory, rather than creating a redundant parent folder. The resulting directory structure is as follows:
 
@@ -266,7 +266,7 @@ challenges_project/          # Project root (created manually)
     └── wsgi.py              # WSGI configuration (standard deployment)
 ```
 
-_Listing 3.5: Directory structure of a newly created Django project with a virtual environment._
+_Listing: Directory structure of a newly created Django project with a virtual environment._
 
 ### Key Project Files
 
@@ -279,7 +279,7 @@ python manage.py migrate          # Apply migrations to the database
 python manage.py createsuperuser  # Create an admin superuser
 ```
 
-_Listing 3.6: Frequently used manage.py commands._
+_Listing: Frequently used manage.py commands._
 
 **`settings.py`** contains all project configuration, including database settings, the list of installed applications, middleware configuration, template engine settings, static file paths, and security settings.
 
@@ -306,7 +306,7 @@ After installing the extensions, configure the Python interpreter to use the pro
 }
 ```
 
-_Listing 3.7: VS Code workspace configuration for Django development._
+_Listing: VS Code workspace configuration for Django development._
 
 **Installing djlint.** The `djlint` tool provides linting and formatting for Django HTML templates:
 
@@ -314,7 +314,7 @@ _Listing 3.7: VS Code workspace configuration for Django development._
 pip install djlint
 ```
 
-_Listing 3.8: Installing djlint for Django template formatting._
+_Listing: Installing djlint for Django template formatting._
 
 Configure djlint as the default formatter for Django HTML files in the VS Code workspace:
 
@@ -330,7 +330,7 @@ Configure djlint as the default formatter for Django HTML files in the VS Code w
 }
 ```
 
-_Listing 3.9: Configuring djlint as the Django HTML formatter in VS Code._
+_Listing: Configuring djlint as the Django HTML formatter in VS Code._
 
 ### Starting the Development Server
 
@@ -345,7 +345,7 @@ python manage.py runserver
 python manage.py runserver 8080
 ```
 
-_Listing 3.10: Starting the Django development server._
+_Listing: Starting the Django development server._
 
 When the server starts successfully, the terminal displays output similar to:
 
@@ -364,7 +364,7 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CTRL-BREAK.
 ```
 
-_Listing 3.11: Terminal output when starting the Django development server for the first time._
+_Listing: Terminal output when starting the Django development server for the first time._
 
 Navigating to `http://127.0.0.1:8000/` in a browser displays Django's default welcome page, confirming that the project is configured correctly. The migration warning can be resolved by running `python manage.py migrate`.
 
@@ -383,7 +383,7 @@ A Django project is composed of one or more apps. An app is a self-contained mod
 python manage.py startapp challenges
 ```
 
-_Listing 3.12: Creating a Django app._
+_Listing: Creating a Django app._
 
 This command generates the following directory structure:
 
@@ -399,7 +399,7 @@ challenges/
     └── __init__.py
 ```
 
-_Listing 3.13: Directory structure of a newly created Django app._
+_Listing: Directory structure of a newly created Django app._
 
 **Registering the app.** Every app must be registered in the project's `settings.py` file by adding it to the `INSTALLED_APPS` list:
 
@@ -416,7 +416,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-_Listing 3.14: Registering a custom app in settings.py._
+_Listing: Registering a custom app in settings.py._
 
 **Complete project structure with an app:**
 
@@ -445,7 +445,7 @@ challenges_project/              # Project root
         └── __init__.py
 ```
 
-_Listing 3.15: Complete project structure with one registered app._
+_Listing: Complete project structure with one registered app._
 
 ---
 
@@ -491,7 +491,7 @@ def article_view(request):
         return HttpResponse("Deleting article")
 ```
 
-_Listing 3.16: Handling multiple HTTP methods in a single view._
+_Listing: Handling multiple HTTP methods in a single view._
 
 ### Query Parameters
 
@@ -506,7 +506,7 @@ def search(request):
     return HttpResponse(f"Searching: {query}, Page: {page}")
 ```
 
-_Listing 3.17: Accessing query parameters from the request._
+_Listing: Accessing query parameters from the request._
 
 ### Creating Views and URL Configurations
 
@@ -522,7 +522,7 @@ def index(request):
     return HttpResponse("Welcome to the Challenges App!")
 ```
 
-_Listing 3.18: A simple view function returning an HTTP response._
+_Listing: A simple view function returning an HTTP response._
 
 **Step 2: Create app-level URL configuration.** Create a new file `challenges/urls.py` (this file is not generated automatically):
 
@@ -536,7 +536,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.19: App-level URL configuration._
+_Listing: App-level URL configuration._
 
 **Step 3: Include the app URLs in the project's root URL configuration:**
 
@@ -551,7 +551,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.20: Including app-level URLs in the root URL configuration._
+_Listing: Including app-level URLs in the root URL configuration._
 
 With this configuration, navigating to `http://127.0.0.1:8000/challenges/` invokes the `index` view.
 
@@ -577,7 +577,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.21: Multiple views and their corresponding URL patterns._
+_Listing: Multiple views and their corresponding URL patterns._
 
 ### Dynamic Path Segments and Path Converters
 
@@ -594,11 +594,11 @@ def monthly_challenge(request, month):
     return HttpResponse(f"Challenge for {month}")
 ```
 
-_Listing 3.22: Dynamic path segment capturing a string parameter._
+_Listing: Dynamic path segment capturing a string parameter._
 
 **Path converters** constrain the type of value that a dynamic segment will match:
 
-_Table 3.6: Django path converters._
+_Table: Django path converters._
 
 | Converter | Matches                                               | Example           |
 | :-------- | :---------------------------------------------------- | :---------------- |
@@ -614,7 +614,7 @@ path('<int:month>/', views.monthly_challenge_by_number),
 path('<slug:title>/', views.post_detail),
 ```
 
-_Listing 3.23: URL patterns using path converters._
+_Listing: URL patterns using path converters._
 
 ### Dynamic View Logic with Data Dictionaries
 
@@ -647,7 +647,7 @@ def monthly_challenge(request, month):
         return HttpResponseNotFound("This month is not supported!")
 ```
 
-_Listing 3.24: A view using a dictionary to serve dynamic content based on the URL._
+_Listing: A view using a dictionary to serve dynamic content based on the URL._
 
 ### Redirects
 
@@ -669,7 +669,7 @@ def monthly_challenge_by_number(request, month):
     return redirect(f'/challenges/{months[month - 1]}/')
 ```
 
-_Listing 3.25: Redirecting using HttpResponseRedirect and the redirect shortcut._
+_Listing: Redirecting using HttpResponseRedirect and the redirect shortcut._
 
 ### The reverse() Function and Named URLs
 
@@ -685,7 +685,7 @@ def monthly_challenge_by_number(request, month):
     return redirect(redirect_url)
 ```
 
-_Listing 3.26: Using reverse() with named URLs for dynamic URL resolution._
+_Listing: Using reverse() with named URLs for dynamic URL resolution._
 
 ### Returning HTML from Views
 
@@ -705,7 +705,7 @@ def index(request):
     return HttpResponse(response_data)
 ```
 
-_Listing 3.27: Dynamically generating HTML with a list of links in a view function._
+_Listing: Dynamically generating HTML with a list of links in a view function._
 
 While functional, embedding HTML strings within Python code mixes presentation with logic. Django's template system, discussed in the next section, separates these concerns.
 
@@ -741,7 +741,7 @@ def api_articles(request):
     return JsonResponse(data)
 ```
 
-_Listing 3.28: Returning a JSON response from a Django view._
+_Listing: Returning a JSON response from a Django view._
 
 The resulting HTTP response contains:
 
@@ -766,11 +766,11 @@ challenges/
         └── challenge.html
 ```
 
-_Listing 3.29: Conventional template directory structure within a Django app._
+_Listing: Conventional template directory structure within a Django app._
 
 The inner `challenges/` folder prevents naming collisions when multiple apps contain templates with the same filename. For example, `challenges/challenge.html` and `blog/challenge.html` can coexist without ambiguity.
 
-The app must be registered in `settings.py` (as shown in Listing 3.10) for Django's template engine to discover its templates.
+The app must be registered in `settings.py` (as shown in Listing) for Django's template engine to discover its templates.
 
 ### Rendering Templates
 
@@ -792,7 +792,7 @@ def monthly_challenge(request, month):
         return HttpResponseNotFound("<h1>This month is not supported!</h1>")
 ```
 
-_Listing 3.30: Rendering a template using render_to_string._
+_Listing: Rendering a template using render_to_string._
 
 **Using the `render` shortcut** (preferred) — Combines template rendering and response creation in a single call:
 
@@ -809,7 +809,7 @@ def monthly_challenge(request, month):
         return HttpResponseNotFound("<h1>This month is not supported!</h1>")
 ```
 
-_Listing 3.31: Rendering a template using the render shortcut._
+_Listing: Rendering a template using the render shortcut._
 
 ### Template Variable Interpolation
 
@@ -836,7 +836,7 @@ def monthly_challenge(request, month):
         return HttpResponseNotFound("<h1>This month is not supported!</h1>")
 ```
 
-_Listing 3.32: Passing context variables to a template._
+_Listing: Passing context variables to a template._
 
 The dictionary `{"text": challenge_text, "month_name": month.capitalize()}` constitutes the template context. The keys become variable names accessible within the template.
 
@@ -858,7 +858,7 @@ Filters transform the value of a variable for display purposes. They are applied
 </pre>
 ```
 
-_Listing 3.33: Commonly used Django template filters._
+_Listing: Commonly used Django template filters._
 
 The `title` filter capitalises the first letter of each word, `truncatewords` limits the output to a specified number of words, and `safe` marks content as safe for rendering without HTML escaping (this should be used only with trusted content).
 
@@ -874,7 +874,7 @@ The `title` filter capitalises the first letter of each word, `truncatewords` li
 </pre>
 ```
 
-_Listing 3.34: Applying the title filter in a template._
+_Listing: Applying the title filter in a template._
 
 ### The for Tag — Looping in Templates
 
@@ -904,7 +904,7 @@ def index(request):
 </pre>
 ```
 
-_Listing 3.35: Using the for tag to iterate over a list in a template._
+_Listing: Using the for tag to iterate over a list in a template._
 
 ### The url Tag — Dynamic URL Generation in Templates
 
@@ -925,7 +925,7 @@ Hardcoding URLs in templates is fragile. The `{% url %}` tag generates URLs dyna
 </pre>
 ```
 
-_Listing 3.36: Using the url tag for dynamic URL generation._
+_Listing: Using the url tag for dynamic URL generation._
 
 The `{% url 'monthly-challenge' month %}` expression resolves to the URL pattern named `monthly-challenge`, passing `month` as the dynamic path argument.
 
@@ -954,7 +954,7 @@ monthly_challenges = {
 </pre>
 ```
 
-_Listing 3.37: Conditional rendering with the if tag._
+_Listing: Conditional rendering with the if tag._
 
 ### Template Inheritance
 
@@ -975,7 +975,7 @@ TEMPLATES = [
 ]
 ```
 
-_Listing 3.38: Adding a global templates directory in settings.py._
+_Listing: Adding a global templates directory in settings.py._
 
 **Step 2: Create the base template** (`templates/base.html`):
 
@@ -996,7 +996,7 @@ _Listing 3.38: Adding a global templates directory in settings.py._
 </pre>
 ```
 
-_Listing 3.39: Base template with named blocks._
+_Listing: Base template with named blocks._
 
 **Step 3: Create child templates** that extend the base:
 
@@ -1019,7 +1019,7 @@ _Listing 3.39: Base template with named blocks._
 </pre>
 ```
 
-_Listing 3.40: Child template extending the base template._
+_Listing: Child template extending the base template._
 
 ```html
 <pre>
@@ -1041,7 +1041,7 @@ _Listing 3.40: Child template extending the base template._
 </pre>
 ```
 
-_Listing 3.41: Another child template overriding base blocks._
+_Listing: Another child template overriding base blocks._
 
 The `{% extends "base.html" %}` directive must be the first tag in the child template. Each `{% block %}` in the child replaces the corresponding block in the base template.
 
@@ -1061,7 +1061,7 @@ The `{% include %}` tag inserts the content of another template file at the poin
 </pre>
 ```
 
-_Listing 3.42: A reusable header partial template._
+_Listing: A reusable header partial template._
 
 **Include the partial in other templates:**
 
@@ -1074,7 +1074,7 @@ _Listing 3.42: A reusable header partial template._
 </pre>
 ```
 
-_Listing 3.43: Including a partial template._
+_Listing: Including a partial template._
 
 Included templates have access to all context variables available to the parent template. Additional variables can be passed using the `with` keyword:
 
@@ -1084,7 +1084,7 @@ Included templates have access to all context variables available to the parent 
 </pre>
 ```
 
-_Listing 3.44: Passing extra variables to an included template._
+_Listing: Passing extra variables to an included template._
 
 ### Custom 404 Templates
 
@@ -1106,7 +1106,7 @@ Django allows custom error pages. To create a custom 404 page, place a `404.html
 </pre>
 ```
 
-_Listing 3.45: Custom 404 error template._
+_Listing: Custom 404 error template._
 
 To trigger a 404 response from a view, raise the `Http404` exception:
 
@@ -1124,7 +1124,7 @@ def monthly_challenge(request, month):
         raise Http404()
 ```
 
-_Listing 3.46: Raising Http404 to trigger the custom 404 template._
+_Listing: Raising Http404 to trigger the custom 404 template._
 
 > **Note:** Custom error pages are displayed only when `DEBUG = False` in `settings.py`. During development (when `DEBUG = True`), Django shows its default debug error page. When setting `DEBUG = False`, you must also set `ALLOWED_HOSTS` (e.g., `ALLOWED_HOSTS = ['*']` for testing purposes).
 
@@ -1144,7 +1144,7 @@ challenges/
             └── logo.png
 ```
 
-_Listing 3.47: App-level static file directory structure._
+_Listing: App-level static file directory structure._
 
 **Loading static files in templates** requires two steps: loading the `static` template tag library with `{% load static %}` and referencing files using the `{% static %}` tag:
 
@@ -1155,7 +1155,7 @@ ul {
 }
 ```
 
-_Listing 3.48: A simple CSS stylesheet for the challenges app._
+_Listing: A simple CSS stylesheet for the challenges app._
 
 First, add a block for CSS files in the base template:
 
@@ -1181,7 +1181,7 @@ Then load the stylesheet in the child template:
 </pre>
 ```
 
-_Listing 3.49: Loading a static CSS file in a template._
+_Listing: Loading a static CSS file in a template._
 
 ### Global Static Files
 
@@ -1196,7 +1196,7 @@ STATICFILES_DIRS = [
 ]
 ```
 
-_Listing 3.50: Configuring the global static files directory._
+_Listing: Configuring the global static files directory._
 
 ```css
 /* static/styles.css */
@@ -1212,7 +1212,7 @@ body {
 }
 ```
 
-_Listing 3.51: A global stylesheet loaded from the project-level static directory._
+_Listing: A global stylesheet loaded from the project-level static directory._
 
 The global stylesheet is loaded in the base template so that it applies to all pages:
 
@@ -1228,7 +1228,7 @@ The global stylesheet is loaded in the base template so that it applies to all p
 </pre>
 ```
 
-_Listing 3.52: Loading the global stylesheet in the base template._
+_Listing: Loading the global stylesheet in the base template._
 
 Individual app templates can then load their own additional stylesheets in the `css_files` block:
 
@@ -1245,7 +1245,7 @@ Individual app templates can then load their own additional stylesheets in the `
 </pre>
 ```
 
-_Listing 3.53: Loading app-specific stylesheets alongside the global stylesheet._
+_Listing: Loading app-specific stylesheets alongside the global stylesheet._
 
 ```html
 <pre>
@@ -1260,7 +1260,7 @@ _Listing 3.53: Loading app-specific stylesheets alongside the global stylesheet.
 </pre>
 ```
 
-_Listing 3.54: Loading stylesheets in the index template._
+_Listing: Loading stylesheets in the index template._
 
 This layered approach—a global stylesheet in the base template and app-specific stylesheets in child templates—ensures visual consistency across the application while allowing per-page customisation.
 
@@ -1276,7 +1276,7 @@ The advantages of using an ORM are significant. First, developers write Python (
 
 ![Class to Table Mapping](/images/class-to-table-mapping.webp)
 
-_Figure 3.4: Mapping between Python classes and relational database tables in an ORM._
+_Figure: Mapping between Python classes and relational database tables in an ORM._
 
 Django supports several database backends:
 
@@ -1297,7 +1297,7 @@ django-admin startproject book_store .
 python manage.py startapp book_outlet
 ```
 
-_Listing 3.55: Creating the book_store project and book_outlet app._
+_Listing: Creating the book_store project and book_outlet app._
 
 After creating the app, register it in `settings.py`:
 
@@ -1309,7 +1309,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-_Listing 3.56: Registering the book_outlet app._
+_Listing: Registering the book_outlet app._
 
 **Defining a model.** Models are defined in the app's `models.py` file. The following model defines a `Book` table with `title` and `rating` columns:
 
@@ -1322,7 +1322,7 @@ class Book(models.Model):
     rating = models.IntegerField()
 ```
 
-_Listing 3.57: A simple Book model._
+_Listing: A simple Book model._
 
 Django automatically adds an `id` field as the primary key. The model above is equivalent to the following SQL:
 
@@ -1334,13 +1334,13 @@ CREATE TABLE book_outlet_book (
 );
 ```
 
-_Listing 3.58: SQL equivalent of the Book model._
+_Listing: SQL equivalent of the Book model._
 
 ### Common Model Field Types
 
 Django provides a comprehensive set of field types, each mapping to an appropriate database column type.
 
-_Table 3.7: Common Django model field types._
+_Table: Common Django model field types._
 
 | Field Type        | Description                      | Example                               |
 | :---------------- | :------------------------------- | :------------------------------------ |
@@ -1360,7 +1360,7 @@ _Table 3.7: Common Django model field types._
 
 Field options are keyword arguments passed to field constructors to control their behaviour at both the database and form levels.
 
-_Table 3.8: Common field options._
+_Table: Common field options._
 
 | Option         | Description                                                 |
 | :------------- | :---------------------------------------------------------- |
@@ -1387,7 +1387,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-_Listing 3.59: Creating and applying migrations._
+_Listing: Creating and applying migrations._
 
 The migration workflow performs the following operations:
 
@@ -1405,7 +1405,7 @@ The Django interactive shell provides a convenient environment for performing da
 python manage.py shell
 ```
 
-_Listing 3.60: Opening the Django interactive shell._
+_Listing: Opening the Django interactive shell._
 
 **Creating records.** New records can be created by instantiating a model object and calling its `save()` method, or by using the `create()` shortcut on the model's manager:
 
@@ -1420,7 +1420,7 @@ harry_potter.save()
 Book.objects.create(title="Lord of the Rings", rating=4, author="J.R.R. Tolkien", is_bestselling=True)
 ```
 
-_Listing 3.61: Creating records using the Django ORM._
+_Listing: Creating records using the Django ORM._
 
 The `save()` method generates and executes an `INSERT` statement:
 
@@ -1429,7 +1429,7 @@ INSERT INTO book_outlet_book (title, rating)
 VALUES ('Harry Potter 1 – The Philosopher''s Stone', 5);
 ```
 
-_Listing 3.62: SQL equivalent of the ORM create operation._
+_Listing: SQL equivalent of the ORM create operation._
 
 **Reading records.** The `all()` method retrieves all records from the table as a `QuerySet`:
 
@@ -1438,7 +1438,7 @@ Book.objects.all()
 # <QuerySet [<Book: Harry Potter 1 (5)>, <Book: Lord of the Rings (4)>]>
 ```
 
-_Listing 3.63: Retrieving all records._
+_Listing: Retrieving all records._
 
 **Updating records.** To update a record, modify its attributes and call `save()`:
 
@@ -1449,7 +1449,7 @@ harry_potter.is_bestselling = True
 harry_potter.save()
 ```
 
-_Listing 3.64: Updating a record._
+_Listing: Updating a record._
 
 **Deleting records.** The `delete()` method removes a record from the database:
 
@@ -1459,7 +1459,7 @@ book.delete()
 # (1, {'book_outlet.Book': 1})
 ```
 
-_Listing 3.65: Deleting a record._
+_Listing: Deleting a record._
 
 **Adding a `__str__` method.** By default, model instances are displayed as `Book object (1)`. Defining a `__str__` method provides a human-readable representation:
 
@@ -1479,7 +1479,7 @@ class Book(models.Model):
         return f"{self.title} ({self.rating})"
 ```
 
-_Listing 3.66: Enhanced Book model with validators and a string representation._
+_Listing: Enhanced Book model with validators and a string representation._
 
 After modifying the model, migrations must be regenerated and applied:
 
@@ -1488,7 +1488,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-_Listing 3.67: Regenerating migrations after model changes._
+_Listing: Regenerating migrations after model changes._
 
 ### Retrieving Data — get, filter, and QuerySet Methods
 
@@ -1504,7 +1504,7 @@ Book.objects.get(is_bestselling=True)
 # Raises MultipleObjectsReturned if more than one bestseller exists
 ```
 
-_Listing 3.68: Using the get() method._
+_Listing: Using the get() method._
 
 **The `filter()` method** returns a QuerySet containing all records that match the specified conditions. Multiple conditions are combined with AND logic:
 
@@ -1516,9 +1516,9 @@ Book.objects.filter(is_bestselling=False, rating=2)
 # <QuerySet [<Book: My Story (2)>]>
 ```
 
-_Listing 3.69: Using the filter() method with multiple conditions._
+_Listing: Using the filter() method with multiple conditions._
 
-_Table 3.9: Summary of common QuerySet methods._
+_Table: Summary of common QuerySet methods._
 
 | Method       | Description                                                                 |
 | :----------- | :-------------------------------------------------------------------------- |
@@ -1550,9 +1550,9 @@ Book.objects.filter(rating__lt=3, title__contains="Story")
 # <QuerySet [<Book: My Story (2)>]>
 ```
 
-_Listing 3.70: Using field lookups in filter queries._
+_Listing: Using field lookups in filter queries._
 
-_Table 3.10: Django field lookup expressions._
+_Table: Django field lookup expressions._
 
 | Lookup       | Description               | Example                             |
 | :----------- | :------------------------ | :---------------------------------- |
@@ -1586,7 +1586,7 @@ Book.objects.filter(Q(rating__lt=3) | Q(is_bestselling=True), author="J.K. Rowli
 # <QuerySet [<Book: Harry Potter 1 (5)>]>
 ```
 
-_Listing 3.71: Constructing OR queries using Q objects._
+_Listing: Constructing OR queries using Q objects._
 
 > **Important:** When mixing `Q` objects with keyword arguments in a `filter()` call, all `Q` objects must appear before any keyword arguments. Placing keyword arguments before `Q` objects results in a `SyntaxError`, because Python requires positional arguments to precede keyword arguments.
 
@@ -1597,7 +1597,7 @@ Book.objects.filter(rating__lt=3, title__icontains="story")
 # <QuerySet [<Book: My Story (2)>]>
 ```
 
-_Listing 3.72: Case-insensitive filtering with icontains._
+_Listing: Case-insensitive filtering with icontains._
 
 ### QuerySet Chaining, Lazy Evaluation, Ordering, and Aggregation
 
@@ -1610,7 +1610,7 @@ print(amazing_bestsellers)  # DB query executes HERE
 # <QuerySet [<Book: Harry Potter 1 (5)>]>
 ```
 
-_Listing 3.73: Demonstrating lazy evaluation by chaining QuerySet filters._
+_Listing: Demonstrating lazy evaluation by chaining QuerySet filters._
 
 The original `bestsellers` QuerySet remains unmodified. Chaining produces a new QuerySet at each step.
 
@@ -1621,7 +1621,7 @@ Book.objects.order_by('title')   # Ascending by title
 Book.objects.order_by('-title')  # Descending by title
 ```
 
-_Listing 3.74: Ordering QuerySets._
+_Listing: Ordering QuerySets._
 
 **Aggregation.** Aggregate functions compute a single summary value across a QuerySet:
 
@@ -1635,7 +1635,7 @@ Book.objects.aggregate(total=Count('id'))
 # {'total': 4}
 ```
 
-_Listing 3.75: Aggregate queries using Avg and Count._
+_Listing: Aggregate queries using Avg and Count._
 
 ### Integrating Models with Views and Templates
 
@@ -1659,7 +1659,7 @@ With models and CRUD operations understood, the next step is to connect the data
 </pre>
 ```
 
-_Listing 3.76: Base template for the book outlet app._
+_Listing: Base template for the book outlet app._
 
 **Step 2: Create the index view and template.** The view retrieves all books from the database and passes them to the template:
 
@@ -1675,7 +1675,7 @@ def index(request):
     })
 ```
 
-_Listing 3.77: Index view passing all books to the template._
+_Listing: Index view passing all books to the template._
 
 ```html
 <pre>
@@ -1700,7 +1700,7 @@ _Listing 3.77: Index view passing all books to the template._
 </pre>
 ```
 
-_Listing 3.78: Index template listing all books with links to detail pages._
+_Listing: Index template listing all books with links to detail pages._
 
 **Step 3: Create the detail view and template.** The `get_object_or_404` shortcut retrieves a single record or raises a 404 error if it does not exist:
 
@@ -1723,7 +1723,7 @@ def book_detail(request, id):
     })
 ```
 
-_Listing 3.79: Detail view using get_object_or_404._
+_Listing: Detail view using get_object_or_404._
 
 ```html
 <pre>
@@ -1747,7 +1747,7 @@ _Listing 3.79: Detail view using get_object_or_404._
 </pre>
 ```
 
-_Listing 3.80: Book detail template with conditional rendering._
+_Listing: Book detail template with conditional rendering._
 
 **Step 4: Configure URLs.** Register the app's URL patterns at both the project and app levels:
 
@@ -1773,7 +1773,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.81: URL configurations for the book outlet app._
+_Listing: URL configurations for the book outlet app._
 
 This example demonstrates the complete data flow in Django's MTV architecture: the Model defines the data structure, the View retrieves data from the database and prepares it for display, and the Template renders the HTML presentation. The `{% url %}` tag generates links to named URL patterns, and the `{% if %}` tag provides conditional rendering based on model attributes.
 
@@ -1963,7 +1963,7 @@ Django includes a built-in administration interface that provides a web-based GU
 python manage.py createsuperuser
 ```
 
-_Listing 3.82: Creating an admin superuser._
+_Listing: Creating an admin superuser._
 
 The command prompts for a username, email address, and password. Once the superuser is created, start the development server and navigate to `http://127.0.0.1:8000/admin/` in a browser to access the admin panel.
 
@@ -1979,7 +1979,7 @@ from .models import Book
 admin.site.register(Book)
 ```
 
-_Listing 3.83: Registering the Book model with the admin site._
+_Listing: Registering the Book model with the admin site._
 
 After refreshing the admin panel, the `Book` model appears under the app's section, providing a full CRUD interface for managing book records.
 
@@ -2000,7 +2000,7 @@ class BookAdmin(admin.ModelAdmin):
 admin.site.register(Book, BookAdmin)
 ```
 
-_Listing 3.84: Customising the admin panel with filters, column display, and search._
+_Listing: Customising the admin panel with filters, column display, and search._
 
 The `list_filter` attribute adds filtering widgets to the sidebar, `list_display` controls which columns are shown in the list view, and `search_fields` adds a search bar that queries the specified fields.
 
@@ -2376,7 +2376,7 @@ HTML forms are the primary mechanism through which users submit data to a web se
 
 Forms use one of two HTTP methods to transmit data:
 
-_Table 3.11: HTTP methods used with HTML forms._
+_Table: HTTP methods used with HTML forms._
 
 | Method   | Usage                               | Data Location                      |
 | :------- | :---------------------------------- | :--------------------------------- |
@@ -2401,7 +2401,7 @@ A basic HTML form in Django includes the CSRF token (discussed in Section 3.8.3)
 </form>
 ```
 
-_Listing 3.85: A basic HTML form with CSRF protection._
+_Listing: A basic HTML form with CSRF protection._
 
 The key attributes of the `<form>` element are `method` (the HTTP method), `action` (the URL to which the data is sent), and `name` on each input field (the key used to access the submitted data on the server).
 
@@ -2424,7 +2424,7 @@ def register(request):
     return render(request, 'register.html')
 ```
 
-_Listing 3.86: Processing POST data in a view._
+_Listing: Processing POST data in a view._
 
 **Accessing GET data.** Query parameters from the URL are accessed through `request.GET`:
 
@@ -2435,9 +2435,9 @@ def search(request):
     return HttpResponse(f"Searching for: {query}")
 ```
 
-_Listing 3.87: Accessing GET query parameters._
+_Listing: Accessing GET query parameters._
 
-_Table 3.12: Methods for accessing form data._
+_Table: Methods for accessing form data._
 
 | Method                                 | Description                                              |
 | :------------------------------------- | :------------------------------------------------------- |
@@ -2475,7 +2475,7 @@ Cross-Site Request Forgery (CSRF) is a class of attack in which a malicious webs
 </form>
 ```
 
-_Listing 3.88: Including the CSRF token in a form._
+_Listing: Including the CSRF token in a form._
 
 The `{% csrf_token %}` tag renders a hidden input field containing the token:
 
@@ -2483,13 +2483,13 @@ The `{% csrf_token %}` tag renders a hidden input field containing the token:
 <input type="hidden" name="csrfmiddlewaretoken" value="abc123xyz..." />
 ```
 
-_Listing 3.89: HTML output of the csrf_token template tag._
+_Listing: HTML output of the csrf_token template tag._
 
 ### The Django Forms API
 
 While it is possible to build forms using raw HTML and process the submitted data manually, Django provides a Forms API that automates form rendering, validation, and error handling.
 
-_Table 3.13: Benefits of using the Django Forms API._
+_Table: Benefits of using the Django Forms API._
 
 | Benefit                 | Description                                    |
 | :---------------------- | :--------------------------------------------- |
@@ -2515,7 +2515,7 @@ class ContactForm(forms.Form):
     email = forms.EmailField()
 ```
 
-_Listing 3.90: Defining a Django form._
+_Listing: Defining a Django form._
 
 **Processing the form in a view.** The view creates a form instance—either empty (for GET requests) or populated with submitted data (for POST requests). The `is_valid()` method triggers validation and populates `cleaned_data` with the sanitised values:
 
@@ -2538,7 +2538,7 @@ def contact(request):
     return render(request, 'contact.html', {'form': form})
 ```
 
-_Listing 3.91: Processing a Django form in a view._
+_Listing: Processing a Django form in a view._
 
 **Rendering the form in a template.** Django provides several methods for rendering forms:
 
@@ -2567,13 +2567,13 @@ _Listing 3.91: Processing a Django form in a view._
 </pre>
 ```
 
-_Listing 3.92: Form rendering options in templates._
+_Listing: Form rendering options in templates._
 
 ### Form Fields, Field Arguments, and Widgets
 
 **Common form field types.** Django provides field types that map to corresponding HTML input elements:
 
-_Table 3.14: Common Django form field types._
+_Table: Common Django form field types._
 
 | Field Type            | Description                  | HTML Element                    |
 | :-------------------- | :--------------------------- | :------------------------------ |
@@ -2625,7 +2625,7 @@ class ExampleForm(forms.Form):
     id_number = forms.CharField(disabled=True)
 ```
 
-_Listing 3.93: Common form field arguments._
+_Listing: Common form field arguments._
 
 **Widgets.** Widgets control how a form field is rendered as HTML. Each field type has a default widget (e.g., `CharField` uses `TextInput`), but this can be overridden:
 
@@ -2643,7 +2643,7 @@ birth_date = forms.DateField(
 )
 ```
 
-_Listing 3.94: Customising field rendering with widgets._
+_Listing: Customising field rendering with widgets._
 
 The `attrs` dictionary adds HTML attributes (such as `class`, `placeholder`, and `type`) to the rendered input element.
 
@@ -2667,7 +2667,7 @@ def clean_email(self):
     return email
 ```
 
-_Listing 3.95: Custom single-field validation._
+_Listing: Custom single-field validation._
 
 **C. Cross-field validation (`clean`)** — The `clean()` method validates relationships between multiple fields:
 
@@ -2681,7 +2681,7 @@ def clean(self):
         raise forms.ValidationError("Passwords do not match")
 ```
 
-_Listing 3.96: Cross-field validation in the clean method._
+_Listing: Cross-field validation in the clean method._
 
 **Displaying non-field errors** (errors raised in the `clean()` method) in the template:
 
@@ -2697,7 +2697,7 @@ _Listing 3.96: Cross-field validation in the clean method._
 </pre>
 ```
 
-_Listing 3.97: Displaying non-field validation errors in a template._
+_Listing: Displaying non-field validation errors in a template._
 
 ### Building a Review Application — A Practical Walkthrough
 
@@ -3338,7 +3338,7 @@ django-admin startproject config .
 python manage.py startapp registration
 ```
 
-_Listing 3.98: Setting up the form validation project._
+_Listing: Setting up the form validation project._
 
 **Project structure:**
 
@@ -3373,7 +3373,7 @@ django-form-validation/
 └── venv/
 ```
 
-_Listing 3.99: Directory structure of the form validation project._
+_Listing: Directory structure of the form validation project._
 
 **Step 1: Register the app and configure media settings** in `config/settings.py`:
 
@@ -3397,7 +3397,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 ```
 
-_Listing 3.100: App registration and media configuration._
+_Listing: App registration and media configuration._
 
 **Step 2: Define the model** in `registration/models.py`:
 
@@ -3443,7 +3443,7 @@ class Registration(models.Model):
         ordering = ['-created_at']
 ```
 
-_Listing 3.101: Registration model with choice fields and file upload._
+_Listing: Registration model with choice fields and file upload._
 
 Run the migrations after defining the model:
 
@@ -3452,7 +3452,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-_Listing 3.102: Applying migrations for the Registration model._
+_Listing: Applying migrations for the Registration model._
 
 **Step 3: Create the form with validation** in `registration/forms.py`:
 
@@ -3597,7 +3597,7 @@ class RegistrationForm(forms.Form):
         return cleaned_data
 ```
 
-_Listing 3.103: Complete registration form with field-level and cross-field validation._
+_Listing: Complete registration form with field-level and cross-field validation._
 
 **Step 4: Create the view** in `registration/views.py`:
 
@@ -3637,7 +3637,7 @@ def registration_form(request):
     return render(request, 'registration/form.html', {'form': form})
 ```
 
-_Listing 3.104: Registration view handling both GET and POST requests._
+_Listing: Registration view handling both GET and POST requests._
 
 Note the use of `request.FILES` as the second argument to the form constructor. This is required for forms that include file upload fields (`enctype="multipart/form-data"`). The `make_password()` function from `django.contrib.auth.hashers` securely hashes the password before storing it in the database.
 
@@ -3672,7 +3672,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-_Listing 3.105: URL configurations for the registration app._
+_Listing: URL configurations for the registration app._
 
 The `app_name` variable enables URL namespacing, allowing URLs to be referenced as `'registration:form'` rather than just `'form'`. The `static()` helper at the bottom of the project URLs serves uploaded media files during development (in production, media files are served by the web server directly).
 
@@ -3740,7 +3740,7 @@ The `app_name` variable enables URL namespacing, allowing URLs to be referenced 
 </pre>
 ```
 
-_Listing 3.106: Registration form template with inline styles and client-side validation._
+_Listing: Registration form template with inline styles and client-side validation._
 
 The template combines Django's server-side form rendering (`{{ form.as_p }}`) with a simple client-side validation function using JavaScript. The `enctype="multipart/form-data"` attribute on the `<form>` element is essential for file uploads. Django's messages framework displays success or error notifications after form submission.
 
@@ -3750,7 +3750,7 @@ The template combines Django's server-side form rendering (`{{ form.as_p }}`) wi
 python manage.py runserver
 ```
 
-_Listing 3.107: Starting the development server._
+_Listing: Starting the development server._
 
 Navigate to `http://127.0.0.1:8000/registration/` to test the registration form. Submitting the form triggers both client-side (JavaScript) and server-side (Django form validation) checks. If validation fails, the form is re-rendered with error messages next to the invalid fields. If validation succeeds, the data is saved to the database and a success message is displayed.
 
@@ -4683,7 +4683,7 @@ Key characteristics of cookies:
 
 ### Cookie Attributes
 
-_Table 3.15: Standard cookie attributes._
+_Table: Standard cookie attributes._
 
 | Attribute    | Description                                                        |
 | :----------- | :----------------------------------------------------------------- |
@@ -4728,7 +4728,7 @@ def set_cookie(request):
     return response
 ```
 
-_Listing 3.108: Setting cookies in a Django view._
+_Listing: Setting cookies in a Django view._
 
 **Accessing cookies.** Cookies sent by the client are available through the `request.COOKIES` dictionary:
 
@@ -4746,7 +4746,7 @@ def get_cookie(request):
         return HttpResponse("Cookie not set.")
 ```
 
-_Listing 3.109: Accessing cookies from the request._
+_Listing: Accessing cookies from the request._
 
 **Deleting cookies.** A cookie is deleted by calling `delete_cookie()` on the response object, which instructs the browser to remove it:
 
@@ -4761,7 +4761,7 @@ def delete_cookie(request):
     return response
 ```
 
-_Listing 3.110: Deleting a cookie._
+_Listing: Deleting a cookie._
 
 ### Sessions
 
@@ -4801,7 +4801,7 @@ SESSION_COOKIE_AGE = 86400 * 30    # 30 days
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 ```
 
-_Listing 3.111: Configuring session settings._
+_Listing: Configuring session settings._
 
 ### Using Sessions in Django
 
@@ -4823,9 +4823,9 @@ username = request.session.get('username', 'Guest')
 request.session.flush()    # Removes all session data and deletes the session
 ```
 
-_Listing 3.112: Basic session operations — store, retrieve, and clear._
+_Listing: Basic session operations — store, retrieve, and clear._
 
-_Table 3.16: Django session methods._
+_Table: Django session methods._
 
 | Method                                | Description                                 |
 | :------------------------------------ | :------------------------------------------ |
@@ -4931,7 +4931,7 @@ The `is_favorite` context variable can then be used in the template to condition
 
 ### Sessions versus Cookies
 
-_Table 3.17: Comparison of cookies and sessions._
+_Table: Comparison of cookies and sessions._
 
 | Aspect          | Cookies                      | Sessions                   |
 | :-------------- | :--------------------------- | :------------------------- |
@@ -4951,7 +4951,7 @@ _Table 3.17: Comparison of cookies and sessions._
 
 Authentication and authorisation are related but distinct security concepts:
 
-_Table 3.18: Authentication versus authorisation._
+_Table: Authentication versus authorisation._
 
 | Concept            | Question           | Purpose                          |
 | :----------------- | :----------------- | :------------------------------- |
@@ -4992,14 +4992,14 @@ class Student(models.Model):
         return self.username
 ```
 
-_Listing 3.113: Student model for the authentication system._
+_Listing: Student model for the authentication system._
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-_Listing 3.114: Running migrations for the Student model._
+_Listing: Running migrations for the Student model._
 
 **Step 2: Create the login, dashboard, and logout views.** The login view uses `check_password()` from `django.contrib.auth.hashers` to verify the submitted password against the stored hash. Upon successful authentication, the student's ID and name are stored in the session:
 
@@ -5046,7 +5046,7 @@ def logout(request):
     return redirect('login')
 ```
 
-_Listing 3.115: Login, dashboard, and logout views using sessions._
+_Listing: Login, dashboard, and logout views using sessions._
 
 > **Security note:** The `check_password()` function compares a plain-text password against a hashed value. Passwords must never be stored in plain text; they should always be hashed using `make_password()` before being saved to the database.
 
@@ -5080,7 +5080,7 @@ _Listing 3.115: Login, dashboard, and logout views using sessions._
 </html>
 ```
 
-_Listing 3.116: Login template._
+_Listing: Login template._
 
 **Step 4: Create the dashboard template.**
 
@@ -5101,7 +5101,7 @@ _Listing 3.116: Login template._
 </pre>
 ```
 
-_Listing 3.117: Dashboard template with logout link._
+_Listing: Dashboard template with logout link._
 
 **Step 5: Configure URLs.**
 
@@ -5128,7 +5128,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.118: URL configurations for the authentication app._
+_Listing: URL configurations for the authentication app._
 
 **Step 6: Create a test user.** Use the Django shell to create a student with a hashed password:
 
@@ -5145,7 +5145,7 @@ Student.objects.create(
 )
 ```
 
-_Listing 3.119: Creating a test user with a hashed password via the Django shell._
+_Listing: Creating a test user with a hashed password via the Django shell._
 
 Navigate to `http://127.0.0.1:8000/auth/login/` to test the login functionality.
 
@@ -5206,7 +5206,7 @@ def student_register(request):
     return render(request, 'myauthapp/register.html')
 ```
 
-_Listing 3.120: Student registration view with validation._
+_Listing: Student registration view with validation._
 
 **Registration template:**
 
@@ -5253,7 +5253,7 @@ _Listing 3.120: Student registration view with validation._
 </pre>
 ```
 
-_Listing 3.121: Registration template with conditional rendering._
+_Listing: Registration template with conditional rendering._
 
 **Update the URL configuration** to include the registration endpoint:
 
@@ -5267,7 +5267,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.122: Updated URL configuration with registration._
+_Listing: Updated URL configuration with registration._
 
 ---
 
@@ -5310,7 +5310,7 @@ class Patient(models.Model):
         return f"{self.name} ({self.patient_id})"
 ```
 
-_Listing 3.123: Patient model._
+_Listing: Patient model._
 
 **Form with validation:**
 
@@ -5380,7 +5380,7 @@ class PatientForm(forms.Form):
         return dob_date
 ```
 
-_Listing 3.124: Patient form with mobile and date-of-birth validation._
+_Listing: Patient form with mobile and date-of-birth validation._
 
 **View:**
 
@@ -5426,7 +5426,7 @@ def patient_list(request):
     return render(request, 'patient/patient_list.html', {'patients': patients})
 ```
 
-_Listing 3.125: Patient registration and list views._
+_Listing: Patient registration and list views._
 
 **Form template:**
 
@@ -5454,7 +5454,7 @@ _Listing 3.125: Patient registration and list views._
 </pre>
 ```
 
-_Listing 3.126: Patient registration form template._
+_Listing: Patient registration form template._
 
 **List template:**
 
@@ -5502,7 +5502,7 @@ _Listing 3.126: Patient registration form template._
 </pre>
 ```
 
-_Listing 3.127: Patient list template with tabular display._
+_Listing: Patient list template with tabular display._
 
 **URL configuration:**
 
@@ -5528,7 +5528,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.128: URL configurations for the patient app._
+_Listing: URL configurations for the patient app._
 
 ### Exercise: User Registration with Username and Password Validation
 
@@ -5557,7 +5557,7 @@ class User(models.Model):
         return self.username
 ```
 
-_Listing 3.129: User model._
+_Listing: User model._
 
 **Form with validation:**
 
@@ -5613,7 +5613,7 @@ class UserRegistrationForm(forms.Form):
         return password
 ```
 
-_Listing 3.130: User registration form with username pattern and password length validation._
+_Listing: User registration form with username pattern and password length validation._
 
 **View:**
 
@@ -5662,7 +5662,7 @@ def user_list(request):
     return render(request, 'user/user_list.html', {'users': users})
 ```
 
-_Listing 3.131: User registration view with duplicate checks._
+_Listing: User registration view with duplicate checks._
 
 **Form template:**
 
@@ -5690,7 +5690,7 @@ _Listing 3.131: User registration view with duplicate checks._
 </pre>
 ```
 
-_Listing 3.132: User registration form template._
+_Listing: User registration form template._
 
 **List template:**
 
@@ -5736,7 +5736,7 @@ _Listing 3.132: User registration form template._
 </pre>
 ```
 
-_Listing 3.133: User list template._
+_Listing: User list template._
 
 **URL configuration:**
 
@@ -5762,7 +5762,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.134: URL configurations for the user app._
+_Listing: URL configurations for the user app._
 
 ### Exercise: File Upload with Validation
 
@@ -5786,7 +5786,7 @@ class UploadedFile(models.Model):
         return self.file.name
 ```
 
-_Listing 3.135: UploadedFile model._
+_Listing: UploadedFile model._
 
 **Form with validation:**
 
@@ -5819,7 +5819,7 @@ class FileUploadForm(forms.Form):
         return file
 ```
 
-_Listing 3.136: File upload form with extension and size validation._
+_Listing: File upload form with extension and size validation._
 
 **View:**
 
@@ -5854,7 +5854,7 @@ def upload_success(request):
     return render(request, 'fileupload/success.html', {'files': files})
 ```
 
-_Listing 3.137: File upload and success views._
+_Listing: File upload and success views._
 
 **Upload template:**
 
@@ -5882,7 +5882,7 @@ _Listing 3.137: File upload and success views._
 </pre>
 ```
 
-_Listing 3.138: File upload template._
+_Listing: File upload template._
 
 > **Important:** The `enctype="multipart/form-data"` attribute on the `<form>` element is essential when the form includes file upload fields. Without it, the browser sends only the filename rather than the file contents. The view must also pass `request.FILES` as the second argument to the form constructor.
 
@@ -5914,7 +5914,7 @@ _Listing 3.138: File upload template._
 </pre>
 ```
 
-_Listing 3.139: Upload success template listing all uploaded files._
+_Listing: Upload success template listing all uploaded files._
 
 **URL and media configuration:**
 
@@ -5945,7 +5945,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-_Listing 3.140: URL and media configurations for the file upload app._
+_Listing: URL and media configurations for the file upload app._
 
 ```python
 # settings.py
@@ -5955,7 +5955,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 ```
 
-_Listing 3.141: Media settings for file uploads._
+_Listing: Media settings for file uploads._
 
 ---
 
@@ -5985,7 +5985,7 @@ class ProjectSubmission(models.Model):
         return f"{self.tu_registration_number} - {self.email}"
 ```
 
-_Listing 3.142: ProjectSubmission model._
+_Listing: ProjectSubmission model._
 
 **Form with validation:**
 
@@ -6029,7 +6029,7 @@ class ProjectSubmissionForm(forms.Form):
         return project_file
 ```
 
-_Listing 3.143: Project submission form with file type and size validation._
+_Listing: Project submission form with file type and size validation._
 
 **View:**
 
@@ -6072,7 +6072,7 @@ def submission_list(request):
     return render(request, 'projectsubmission/submission_list.html', {'submissions': submissions})
 ```
 
-_Listing 3.144: Project upload and submission list views._
+_Listing: Project upload and submission list views._
 
 **Form template:**
 
@@ -6100,7 +6100,7 @@ _Listing 3.144: Project upload and submission list views._
 </pre>
 ```
 
-_Listing 3.145: Project submission form template._
+_Listing: Project submission form template._
 
 **Submission list template:**
 
@@ -6142,7 +6142,7 @@ _Listing 3.145: Project submission form template._
 </pre>
 ```
 
-_Listing 3.146: Submission list template._
+_Listing: Submission list template._
 
 **URL and media configuration:**
 
@@ -6173,7 +6173,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-_Listing 3.147: URL and media configurations for the project submission app._
+_Listing: URL and media configurations for the project submission app._
 
 ---
 
@@ -6190,7 +6190,7 @@ Each middleware component can:
 - Short-circuit the request processing by returning a response early (without calling the view).
 - Add headers, log information, handle errors, or perform other cross-cutting concerns.
 
-_Table 3.19: Common middleware use cases._
+_Table: Common middleware use cases._
 
 | Use Case               | Description                                         |
 | :--------------------- | :-------------------------------------------------- |
@@ -6232,7 +6232,7 @@ MIDDLEWARE = [
 ]
 ```
 
-_Listing 3.148: Django's default middleware stack with annotations._
+_Listing: Django's default middleware stack with annotations._
 
 > **Important:** The order of middleware in the `MIDDLEWARE` list matters. Middleware is processed top-to-bottom for requests and bottom-to-top for responses. For example, `SecurityMiddleware` should be near the top to ensure security headers are added to all responses, while `AuthenticationMiddleware` must come after `SessionMiddleware` because it depends on session data.
 
@@ -6266,7 +6266,7 @@ def request_timing_middleware(get_response):
     return middleware
 ```
 
-_Listing 3.149: Custom function-based middleware for request timing._
+_Listing: Custom function-based middleware for request timing._
 
 **Register the middleware** in `settings.py`:
 
@@ -6285,7 +6285,7 @@ MIDDLEWARE = [
 ]
 ```
 
-_Listing 3.150: Registering custom middleware in settings.py._
+_Listing: Registering custom middleware in settings.py._
 
 When a request is processed, the terminal displays output such as:
 
@@ -6294,7 +6294,7 @@ When a request is processed, the terminal displays output such as:
 /dashboard/ took 0.34 seconds. Completed with status 200.
 ```
 
-_Listing 3.151: Terminal output from the request timing middleware._
+_Listing: Terminal output from the request timing middleware._
 
 ### Error Handling Middleware
 
@@ -6334,7 +6334,7 @@ def error_handling_middleware(get_response):
     return middleware
 ```
 
-_Listing 3.152: Error handling middleware that returns JSON responses for different exception types._
+_Listing: Error handling middleware that returns JSON responses for different exception types._
 
 To test this middleware, create views that raise different exceptions:
 
@@ -6355,7 +6355,7 @@ def safe_view(request):
     return HttpResponse("Everything is fine")
 ```
 
-_Listing 3.153: Test views that raise various exceptions._
+_Listing: Test views that raise various exceptions._
 
 ```python
 # app-level urls.py
@@ -6370,7 +6370,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.154: URL patterns for testing error handling middleware._
+_Listing: URL patterns for testing error handling middleware._
 
 Register the error handling middleware above `SessionMiddleware` so that it can catch exceptions from all subsequent middleware and views:
 
@@ -6388,7 +6388,7 @@ MIDDLEWARE = [
 ]
 ```
 
-_Listing 3.155: Middleware stack with both custom middleware components._
+_Listing: Middleware stack with both custom middleware components._
 
 ---
 
@@ -6402,7 +6402,7 @@ Using a framework saves development time, enforces best practices, and reduces t
 
 ### Types of Web Frameworks
 
-_Table 3.20: Categories of web frameworks._
+_Table: Categories of web frameworks._
 
 | Type           | Description                                       | Examples               |
 | :------------- | :------------------------------------------------ | :--------------------- |
@@ -6416,7 +6416,7 @@ Django is a full-stack framework following the "batteries included" philosophy. 
 
 Django is best suited for content management systems, e-commerce sites, social networks, and data-driven applications. It powers large-scale platforms such as Instagram and Pinterest.
 
-_Table 3.21: Django — advantages and disadvantages._
+_Table: Django — advantages and disadvantages._
 
 | Advantages                                  | Disadvantages                                |
 | :------------------------------------------ | :------------------------------------------- |
@@ -6432,7 +6432,7 @@ Flask is a micro framework with a minimal core and maximum flexibility. It provi
 
 Flask is best suited for small to medium applications, APIs, microservices, prototypes, and learning web development.
 
-_Table 3.22: Flask — advantages and disadvantages._
+_Table: Flask — advantages and disadvantages._
 
 | Advantages                           | Disadvantages                           |
 | :----------------------------------- | :-------------------------------------- |
@@ -6447,7 +6447,7 @@ FastAPI is an API-first micro framework designed for speed, modern Python featur
 
 FastAPI is best suited for REST APIs, microservices, high-performance applications, and machine learning APIs.
 
-_Table 3.23: FastAPI — advantages and disadvantages._
+_Table: FastAPI — advantages and disadvantages._
 
 | Advantages                                   | Disadvantages                              |
 | :------------------------------------------- | :----------------------------------------- |
@@ -6462,7 +6462,7 @@ ASP.NET Core is a full-stack, cross-platform framework built on .NET Core. It fe
 
 It is best suited for enterprise applications, Windows environments, large-scale systems, and projects within the Microsoft ecosystem.
 
-_Table 3.24: ASP.NET Core — advantages and disadvantages._
+_Table: ASP.NET Core — advantages and disadvantages._
 
 | Advantages                       | Disadvantages                       |
 | :------------------------------- | :---------------------------------- |
@@ -6477,7 +6477,7 @@ Ruby on Rails is a full-stack framework following the "convention over configura
 
 It is best suited for startups, rapid prototyping, MVPs, e-commerce platforms, and content-heavy sites.
 
-_Table 3.25: Ruby on Rails — advantages and disadvantages._
+_Table: Ruby on Rails — advantages and disadvantages._
 
 | Advantages                              | Disadvantages                       |
 | :-------------------------------------- | :---------------------------------- |
@@ -6492,7 +6492,7 @@ Spring Boot is a full-stack framework that simplifies enterprise Java developmen
 
 It is best suited for enterprise applications, microservices, large-scale systems, and Java ecosystem projects.
 
-_Table 3.26: Spring Boot — advantages and disadvantages._
+_Table: Spring Boot — advantages and disadvantages._
 
 | Advantages                          | Disadvantages                 |
 | :---------------------------------- | :---------------------------- |
@@ -6507,7 +6507,7 @@ Express.js is a minimalist, unopinionated micro framework for Node.js. It provid
 
 It is best suited for real-time applications, APIs and microservices, single-page applications (with React or Vue), and JavaScript full-stack development.
 
-_Table 3.27: Express.js — advantages and disadvantages._
+_Table: Express.js — advantages and disadvantages._
 
 | Advantages                                         | Disadvantages                              |
 | :------------------------------------------------- | :----------------------------------------- |
@@ -6518,7 +6518,7 @@ _Table 3.27: Express.js — advantages and disadvantages._
 
 ### Framework Comparison
 
-_Table 3.28: Side-by-side comparison of popular backend frameworks._
+_Table: Side-by-side comparison of popular backend frameworks._
 
 | Feature         | Django    | Flask     | FastAPI   | ASP.NET Core   | Rails  | Spring Boot | Express.js |
 | :-------------- | :-------- | :-------- | :-------- | :------------- | :----- | :---------- | :--------- |
@@ -6533,7 +6533,7 @@ _Table 3.28: Side-by-side comparison of popular backend frameworks._
 
 ### Choosing the Right Framework
 
-_Table 3.29: Framework recommendations by project type._
+_Table: Framework recommendations by project type._
 
 | Consideration         | Recommendation                          |
 | :-------------------- | :-------------------------------------- |
@@ -6564,7 +6564,7 @@ Key characteristics:
 - Complex queries involving joins across multiple tables are supported.
 - Transactions guarantee that a series of operations either all succeed or all fail.
 
-_Table 3.30: Popular relational databases._
+_Table: Popular relational databases._
 
 | Database       | Description                         |
 | :------------- | :---------------------------------- |
@@ -6588,13 +6588,13 @@ _Table 3.30: Popular relational databases._
 └─────┴──────────┴─────────────────────┴──────────────┘
 ```
 
-_Listing 3.156: Visual representation of a relational database table._
+_Listing: Visual representation of a relational database table._
 
 ### NoSQL Databases
 
 NoSQL databases store data in flexible formats other than traditional tables. They are designed for scalability and handling unstructured or semi-structured data.
 
-_Table 3.31: Types of NoSQL databases._
+_Table: Types of NoSQL databases._
 
 | Type              | Description                     | Examples         |
 | :---------------- | :------------------------------ | :--------------- |
@@ -6626,11 +6626,11 @@ Key characteristics:
 }
 ```
 
-_Listing 3.157: A MongoDB document illustrating the flexible, nested structure of a document database._
+_Listing: A MongoDB document illustrating the flexible, nested structure of a document database._
 
 ### Relational versus NoSQL — Comparison
 
-_Table 3.32: Comparison of relational and NoSQL databases._
+_Table: Comparison of relational and NoSQL databases._
 
 | Aspect             | Relational (SQL)               | NoSQL                              |
 | :----------------- | :----------------------------- | :--------------------------------- |
@@ -6650,7 +6650,7 @@ _Table 3.32: Comparison of relational and NoSQL databases._
 
 CRUD represents the four basic operations for persistent storage:
 
-_Table 3.33: CRUD operations mapped to SQL commands and HTTP methods._
+_Table: CRUD operations mapped to SQL commands and HTTP methods._
 
 | Operation  | Description          | SQL Command | HTTP Method |
 | :--------- | :------------------- | :---------- | :---------- |
@@ -6677,7 +6677,7 @@ UPDATE users SET email = 'newemail@example.com' WHERE id = 1;
 DELETE FROM users WHERE id = 1;
 ```
 
-_Listing 3.158: CRUD operations using raw SQL._
+_Listing: CRUD operations using raw SQL._
 
 ---
 
@@ -6709,7 +6709,7 @@ pip install django
 django-admin --version
 ```
 
-_Listing 3.159: Setting up Python, a virtual environment, and Django._
+_Listing: Setting up Python, a virtual environment, and Django._
 
 **Creating the project and app:**
 
@@ -6718,7 +6718,7 @@ django-admin startproject crud .
 python manage.py startapp notes
 ```
 
-_Listing 3.160: Creating the CRUD project and the notes app._
+_Listing: Creating the CRUD project and the notes app._
 
 ### Model Definition
 
@@ -6732,7 +6732,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-_Listing 3.161: Registering the notes app._
+_Listing: Registering the notes app._
 
 Define the model:
 
@@ -6749,7 +6749,7 @@ class Note(models.Model):
         return self.title
 ```
 
-_Listing 3.162: Note model._
+_Listing: Note model._
 
 The equivalent SQL for this model is:
 
@@ -6761,7 +6761,7 @@ CREATE TABLE notes_note (
 );
 ```
 
-_Listing 3.163: SQL equivalent of the Note model._
+_Listing: SQL equivalent of the Note model._
 
 Run migrations and create sample data:
 
@@ -6770,7 +6770,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-_Listing 3.164: Running migrations._
+_Listing: Running migrations._
 
 ```bash
 python manage.py shell
@@ -6787,7 +6787,7 @@ Note.objects.all()
 exit()
 ```
 
-_Listing 3.165: Creating sample notes via the Django shell._
+_Listing: Creating sample notes via the Django shell._
 
 ### Form with Validation
 
@@ -6828,7 +6828,7 @@ class NoteForm(forms.Form):
         return instance
 ```
 
-_Listing 3.166: NoteForm with custom validation and create/update helper methods._
+_Listing: NoteForm with custom validation and create/update helper methods._
 
 ### CRUD Views
 
@@ -6887,7 +6887,7 @@ def delete_note(request, note_id):
     return redirect('notes:index')
 ```
 
-_Listing 3.167: Complete CRUD views using the NoteForm._
+_Listing: Complete CRUD views using the NoteForm._
 
 ### Static Files
 
@@ -6920,7 +6920,7 @@ td {
 }
 ```
 
-_Listing 3.168: Application stylesheet._
+_Listing: Application stylesheet._
 
 Configure static files in `settings.py`:
 
@@ -6932,7 +6932,7 @@ STATICFILES_DIRS = [
 ]
 ```
 
-_Listing 3.169: Static file configuration._
+_Listing: Static file configuration._
 
 ### Templates with Inheritance
 
@@ -6950,7 +6950,7 @@ _Listing 3.169: Static file configuration._
 </pre>
 ```
 
-_Listing 3.170: Navigation partial template._
+_Listing: Navigation partial template._
 
 **Base template** (`notes/templates/notes/base.html`):
 
@@ -6979,7 +6979,7 @@ _Listing 3.170: Navigation partial template._
 </pre>
 ```
 
-_Listing 3.171: Base template with static CSS, navigation include, messages, and content block._
+_Listing: Base template with static CSS, navigation include, messages, and content block._
 
 **Index template** (`notes/templates/notes/index.html`):
 
@@ -7017,7 +7017,7 @@ _Listing 3.171: Base template with static CSS, navigation include, messages, and
 </pre>
 ```
 
-_Listing 3.172: Index template listing all notes with edit and delete actions._
+_Listing: Index template listing all notes with edit and delete actions._
 
 **Add template** (`notes/templates/notes/add.html`):
 
@@ -7037,7 +7037,7 @@ _Listing 3.172: Index template listing all notes with edit and delete actions._
 </pre>
 ```
 
-_Listing 3.173: Add note template using form rendering._
+_Listing: Add note template using form rendering._
 
 **Edit template** (`notes/templates/notes/edit.html`):
 
@@ -7057,7 +7057,7 @@ _Listing 3.173: Add note template using form rendering._
 </pre>
 ```
 
-_Listing 3.174: Edit note template._
+_Listing: Edit note template._
 
 ### URL Configuration
 
@@ -7087,7 +7087,7 @@ urlpatterns = [
 ]
 ```
 
-_Listing 3.175: URL configurations for the notes app._
+_Listing: URL configurations for the notes app._
 
 Start the development server and navigate to `http://127.0.0.1:8000/notes/`:
 
@@ -7095,7 +7095,7 @@ Start the development server and navigate to `http://127.0.0.1:8000/notes/`:
 python manage.py runserver
 ```
 
-_Listing 3.176: Starting the development server._
+_Listing: Starting the development server._
 
 ### Admin Registration
 
@@ -7105,7 +7105,7 @@ Create a superuser and register the model with the admin site:
 python manage.py createsuperuser
 ```
 
-_Listing 3.177: Creating a superuser._
+_Listing: Creating a superuser._
 
 ```python
 # notes/admin.py
@@ -7115,7 +7115,7 @@ from .models import Note
 admin.site.register(Note)
 ```
 
-_Listing 3.178: Registering the Note model with the admin site._
+_Listing: Registering the Note model with the admin site._
 
 Navigate to `http://127.0.0.1:8000/admin` to access the admin panel.
 
@@ -7135,7 +7135,7 @@ def add(a, b):
     return a + b
 ```
 
-_Listing 3.179: A simple utility function._
+_Listing: A simple utility function._
 
 ```python
 # notes/tests.py
@@ -7148,7 +7148,7 @@ class AddFunctionTestCase(TestCase):
         self.assertEqual(add(2, 3), 5)
 ```
 
-_Listing 3.180: Unit test for the add function._
+_Listing: Unit test for the add function._
 
 Run the tests:
 
@@ -7162,7 +7162,7 @@ Ran 1 test in 0.001s
 OK
 ```
 
-_Listing 3.181: Running Django tests and expected output._
+_Listing: Running Django tests and expected output._
 
 ### Integration Testing
 
@@ -7211,7 +7211,7 @@ class NotesTestCase(TestCase):
             response, 'Description must be at least 10 characters long')
 ```
 
-_Listing 3.182: View and integration tests for the notes app._
+_Listing: View and integration tests for the notes app._
 
 ```text
 Ran 4 tests in 0.062s
@@ -7219,7 +7219,7 @@ Ran 4 tests in 0.062s
 OK
 ```
 
-_Listing 3.183: Output after running all four tests._
+_Listing: Output after running all four tests._
 
 ### Continuous Integration with GitHub Actions
 
@@ -7259,7 +7259,7 @@ jobs:
           python manage.py test
 ```
 
-_Listing 3.184: GitHub Actions workflow for automated testing._
+_Listing: GitHub Actions workflow for automated testing._
 
 Generate the `requirements.txt` file before pushing:
 
@@ -7267,7 +7267,7 @@ Generate the `requirements.txt` file before pushing:
 pip freeze > requirements.txt
 ```
 
-_Listing 3.185: Generating requirements.txt._
+_Listing: Generating requirements.txt._
 
 Once pushed, every commit to the `main` branch triggers the workflow. GitHub creates a virtual machine, installs Python and project dependencies, and runs the test suite. Results are visible under the **Actions** tab of the GitHub repository.
 
@@ -7295,7 +7295,7 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 ```
 
-_Listing 3.186: Production settings for Render deployment._
+_Listing: Production settings for Render deployment._
 
 **Step 2: Set up static file serving with WhiteNoise.** In production, Django's development server is not available to serve static files. WhiteNoise serves static files directly from the application:
 
@@ -7303,7 +7303,7 @@ _Listing 3.186: Production settings for Render deployment._
 pip install "whitenoise[brotli]"
 ```
 
-_Listing 3.187: Installing WhiteNoise with Brotli compression support._
+_Listing: Installing WhiteNoise with Brotli compression support._
 
 Update `settings.py`:
 
@@ -7323,7 +7323,7 @@ if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ```
 
-_Listing 3.188: WhiteNoise middleware and static file settings for production._
+_Listing: WhiteNoise middleware and static file settings for production._
 
 **Step 3: Create a build script** (`build.sh`):
 
@@ -7337,7 +7337,7 @@ python manage.py collectstatic --no-input
 python manage.py migrate
 ```
 
-_Listing 3.189: Build script for Render._
+_Listing: Build script for Render._
 
 The `set -o errexit` flag causes the script to exit immediately if any command fails. The `--no-input` flag runs `collectstatic` without prompting for confirmation.
 
@@ -7348,7 +7348,7 @@ pip install gunicorn uvicorn
 pip freeze > requirements.txt
 ```
 
-_Listing 3.190: Installing Gunicorn and Uvicorn._
+_Listing: Installing Gunicorn and Uvicorn._
 
 Test locally:
 
@@ -7356,7 +7356,7 @@ Test locally:
 uvicorn crud.asgi:application
 ```
 
-_Listing 3.191: Running the application with Uvicorn locally._
+_Listing: Running the application with Uvicorn locally._
 
 **Step 5: Define the web service** (`render.yaml`):
 
@@ -7370,7 +7370,7 @@ services:
     startCommand: "python -m gunicorn crud.asgi:application -k uvicorn.workers.UvicornWorker"
 ```
 
-_Listing 3.192: Render blueprint configuration._
+_Listing: Render blueprint configuration._
 
 **Step 6: Deploy from the Render dashboard.**
 
@@ -7395,7 +7395,7 @@ Install Selenium and pytest:
 pip install selenium pytest
 ```
 
-_Listing 3.193: Installing Selenium and pytest._
+_Listing: Installing Selenium and pytest._
 
 Create a test file (`uitest.py`) at the project root:
 
@@ -7442,7 +7442,7 @@ def test_error_occurs_if_description_is_less_than_10_chars_long():
     driver.quit()
 ```
 
-_Listing 3.194: Selenium UI tests for the notes app._
+_Listing: Selenium UI tests for the notes app._
 
 Run the tests (the development server must be running separately):
 
@@ -7450,7 +7450,7 @@ Run the tests (the development server must be running separately):
 pytest uitest.py
 ```
 
-_Listing 3.195: Running Selenium tests with pytest._
+_Listing: Running Selenium tests with pytest._
 
 > **Note:** The `time.sleep(2)` calls are a simple but crude approach to waiting for page loads. In production test suites, explicit waits using `WebDriverWait` and expected conditions are preferred, as they are both faster and more reliable.
 
@@ -7481,7 +7481,7 @@ Selenium can also test simple HTML pages served by any web server. Consider a st
 </html>
 ```
 
-_Listing 3.196: A static HTML login form for Selenium testing._
+_Listing: A static HTML login form for Selenium testing._
 
 ```python
 from selenium import webdriver
@@ -7502,7 +7502,7 @@ def test_user_can_login():
     driver.quit()
 ```
 
-_Listing 3.197: Selenium test for the static login form._
+_Listing: Selenium test for the static login form._
 
 ---
 
@@ -7519,7 +7519,7 @@ Cross-Site Scripting (XSS) is a security vulnerability that allows attackers to 
 <td>{{ note.description|safe }}</td>
 ```
 
-_Listing 3.198: Disabling auto-escaping with the safe filter (vulnerable)._
+_Listing: Disabling auto-escaping with the safe filter (vulnerable)._
 
 If an attacker submits the following as a note description:
 
@@ -7531,7 +7531,7 @@ If an attacker submits the following as a note description:
 </script>
 ```
 
-_Listing 3.199: Example XSS payload._
+_Listing: Example XSS payload._
 
 The script will execute in every user's browser when they view the note. Django's default auto-escaping prevents this by converting `<script>` tags into harmless `&lt;script&gt;` entities.
 
@@ -7570,7 +7570,7 @@ def add_note_sql_injection(request):
     return render(request, 'notes/add.html', {'form': form})
 ```
 
-_Listing 3.200: A view vulnerable to SQL injection (string interpolation in SQL queries)._
+_Listing: A view vulnerable to SQL injection (string interpolation in SQL queries)._
 
 An attacker who enters the following as a description can delete all data from the table:
 
@@ -7585,7 +7585,7 @@ INSERT INTO notes_note (title, description)
 VALUES ('My Test Note', ''); DELETE FROM notes_note; -- ');
 ```
 
-_Listing 3.201: SQL injection payload that deletes all records._
+_Listing: SQL injection payload that deletes all records._
 
 An even more destructive payload can drop the entire table:
 
@@ -7631,7 +7631,7 @@ Cross-Site Request Forgery (CSRF) is an attack that forces authenticated users t
 </html>
 ```
 
-_Listing 3.202: A malicious page that performs a CSRF attack._
+_Listing: A malicious page that performs a CSRF attack._
 
 When a victim visits this page, the hidden form is automatically submitted to the Django application. Because the browser includes the victim's session cookie, the server processes the request as if it were legitimate.
 
@@ -7647,7 +7647,7 @@ def add_note(request):
     # ... view code ...
 ```
 
-_Listing 3.203: Disabling CSRF protection (vulnerable)._
+_Listing: Disabling CSRF protection (vulnerable)._
 
 > **Important:** Never disable CSRF protection on views that process state-changing requests (POST, PUT, DELETE). Always include `{% csrf_token %}` in Django forms and allow `CsrfViewMiddleware` to validate tokens.
 
@@ -7675,9 +7675,9 @@ def add_note_sql_injection(request):
     # ... view code ...
 ```
 
-_Listing 3.204: Combining login_required with csrf_exempt (vulnerable)._
+_Listing: Combining login_required with csrf_exempt (vulnerable)._
 
-5. Save the malicious HTML page (Listing 3.202) as `csrf.html` and open it via a Live Server at `http://127.0.0.1:5500/csrf.html`.
+5. Save the malicious HTML page (Listing) as `csrf.html` and open it via a Live Server at `http://127.0.0.1:5500/csrf.html`.
 
 When the user is not authenticated, the `@login_required` decorator redirects to the login page. Since the malicious page submits to a Django URL, the redirect results in a `404` error on the attacker's origin—the attack fails.
 
