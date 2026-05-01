@@ -3752,6 +3752,917 @@ Navigate to `http://127.0.0.1:8000/registration/` to test the registration form.
 
 ---
 
+## Class-Based Views
+
+The previous section introduced class-based views by converting a function-based review view into a `View` subclass with `get()` and `post()` methods. This section continues that progression by exploring Django's hierarchy of generic class-based views, which eliminate boilerplate for common patterns such as rendering templates, listing objects, displaying detail pages, and handling form submissions.
+
+### Refactoring Templates with a Base Layout
+
+Before adding more views, the templates are refactored to use a shared base template that loads static files and defines reusable blocks:
+
+```html
+<pre>
+<!-- reviews/templates/reviews/base.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    {% block title %}
+    {% endblock %}
+  </title>
+  <link rel="stylesheet" href="{% static "reviews/styles.css" %}">
+</head>
+<body>
+  {% block content %}
+  {% endblock %}
+</body>
+</html>
+</pre>
+```
+
+_Listing: Base template with static CSS and block definitions._
+
+The review form and thank-you templates now extend the base template:
+
+```html
+<pre>
+<!-- reviews/templates/reviews/review.html -->
+{% extends "reviews/base.html" %}
+
+{% block title %}Your Review{% endblock %}
+
+{% block content %}
+  <form action="/" method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-control {% if field.errors %}errors{% endif %}">
+        {{ field.label_tag }}
+        {{ field }}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <button type="submit">Send</button>
+  </form>
+{% endblock %}
+</pre>
+```
+
+_Listing: Review form template extending the base layout._
+
+```html
+<pre>
+<!-- reviews/templates/reviews/thank_you.html -->
+{% extends "reviews/base.html" %}
+
+{% block title %}Thank you!{% endblock %}
+
+{% block content %}
+  <h1>Thank you!</h1>
+{% endblock %}
+</pre>
+```
+
+_Listing: Thank-you template extending the base layout._
+
+### TemplateView
+
+`TemplateView` is the simplest generic view—it renders a template and optionally passes context data. It replaces the pattern of writing a `View` subclass that only calls `render()` in its `get()` method.
+
+**Basic usage.** The thank-you view can be simplified from a manual `View` subclass:
+
+```python
+# Using the base View class (verbose)
+from django.views import View
+
+class ThankYouView(View):
+    def get(self, request):
+        return render(request, "reviews/thank_you.html")
+```
+
+_Listing: Thank-you view using the base View class._
+
+To a `TemplateView` that only requires the template name:
+
+```python
+# Using TemplateView (concise)
+from django.views.generic.base import TemplateView
+
+class ThankYouView(TemplateView):
+    template_name = "reviews/thank_you.html"
+```
+
+_Listing: Thank-you view using TemplateView._
+
+The URL configuration uses `as_view()` as before:
+
+```python
+# reviews/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.ReviewView.as_view()),
+    path("thank-you", views.ThankYouView.as_view())
+]
+```
+
+_Listing: URL configuration with TemplateView._
+
+**Passing context data.** The `get_context_data()` method is overridden to pass additional variables to the template:
+
+```python
+from django.views.generic.base import TemplateView
+
+
+class ThankYouView(TemplateView):
+    template_name = "reviews/thank_you.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["message"] = "This works!"
+        return context
+```
+
+_Listing: TemplateView with custom context data._
+
+The template accesses the context variable:
+
+```html
+<pre>
+{% extends "reviews/base.html" %}
+
+{% block title %}Thank you!{% endblock %}
+
+{% block content %}
+  <h1>Thank you!</h1>
+  <p>{{ message }}</p>
+{% endblock %}
+</pre>
+```
+
+_Listing: Template rendering context data from TemplateView._
+
+> **Note:** Always call `super().get_context_data(**kwargs)` first to ensure any context provided by parent classes or mixins is preserved before adding custom entries.
+
+### Listing Objects with TemplateView
+
+Before introducing `ListView`, a list of reviews can be rendered using `TemplateView` with a manually constructed QuerySet:
+
+```python
+# reviews/views.py
+class ReviewsListView(TemplateView):
+    template_name = "reviews/review_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        reviews = Review.objects.all()
+        context["reviews"] = reviews
+        return context
+```
+
+_Listing: Listing reviews using TemplateView._
+
+```html
+<pre>
+<!-- reviews/templates/reviews/review_list.html -->
+{% extends "reviews/base.html" %}
+
+{% block title %}All Reviews{% endblock %}
+
+{% block content %}
+  <ul>
+    {% for review in reviews %}
+      <li>{{ review.user_name }} (Rating: {{ review.rating }})</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+</pre>
+```
+
+_Listing: Review list template._
+
+```python
+# reviews/urls.py (add to urlpatterns)
+path("reviews", views.ReviewsListView.as_view()),
+```
+
+_Listing: URL pattern for the reviews list._
+
+### Displaying Detail Pages with TemplateView
+
+Similarly, a detail page can be built using `TemplateView` by extracting URL parameters from `kwargs`:
+
+```python
+class SingleReviewView(TemplateView):
+    template_name = "reviews/single_review.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        review_id = kwargs["id"]
+        selected_review = Review.objects.get(pk=review_id)
+        context["review"] = selected_review
+        return context
+```
+
+_Listing: Detail view using TemplateView with URL parameters._
+
+```html
+<pre>
+<!-- reviews/templates/reviews/single_review.html -->
+{% extends "reviews/base.html" %}
+
+{% block title %}Review Detail{% endblock %}
+
+{% block content %}
+  <h1>{{ review.user_name }}</h1>
+  <p>Rating: {{ review.rating }}</p>
+  <p>{{ review.review_text }}</p>
+{% endblock %}
+</pre>
+```
+
+_Listing: Single review detail template._
+
+```python
+# reviews/urls.py (add to urlpatterns)
+path("reviews/<int:id>", views.SingleReviewView.as_view())
+```
+
+_Listing: URL pattern with integer parameter for detail view._
+
+While this approach works, it involves repetitive boilerplate—fetching a QuerySet, looking up by primary key, passing context. Django's generic views automate these patterns.
+
+### ListView
+
+`ListView` is a generic view designed specifically for displaying a list of objects from a model. It automatically fetches all records and passes them to the template:
+
+```python
+from django.views.generic import ListView
+from .models import Review
+
+
+class ReviewsListView(ListView):
+    template_name = "reviews/review_list.html"
+    model = Review
+```
+
+_Listing: ReviewsListView using ListView._
+
+By default, `ListView` passes the QuerySet to the template under the context name `object_list`:
+
+```html
+<pre>
+<ul>
+  {% for review in object_list %}
+    <li>{{ review.user_name }} (Rating: {{ review.rating }})</li>
+  {% endfor %}
+</ul>
+</pre>
+```
+
+_Listing: Template using the default object_list context name._
+
+**Custom context name.** The `context_object_name` attribute provides a more descriptive name:
+
+```python
+class ReviewsListView(ListView):
+    template_name = "reviews/review_list.html"
+    model = Review
+    context_object_name = "reviews"
+```
+
+_Listing: ListView with a custom context object name._
+
+```html
+<pre>
+<ul>
+  {% for review in reviews %}
+    <li>{{ review.user_name }} (Rating: {{ review.rating }})</li>
+  {% endfor %}
+</ul>
+</pre>
+```
+
+_Listing: Template using the custom context name._
+
+**Custom QuerySet.** The `get_queryset()` method can be overridden to filter, order, or annotate the QuerySet:
+
+```python
+class ReviewsListView(ListView):
+    template_name = "reviews/review_list.html"
+    model = Review
+    context_object_name = "reviews"
+
+    def get_queryset(self):
+        base_query = super().get_queryset()
+        data = base_query.filter(rating__gt=4)
+        return data
+```
+
+_Listing: ListView with a filtered QuerySet._
+
+### DetailView
+
+`DetailView` is a generic view that retrieves and displays a single object. It expects a `pk` or `slug` parameter in the URL:
+
+```python
+from django.views.generic import ListView, DetailView
+from .models import Review
+
+
+class SingleReviewView(DetailView):
+    template_name = "reviews/single_review.html"
+    model = Review
+```
+
+_Listing: SingleReviewView using DetailView._
+
+```python
+# reviews/urls.py
+path("reviews/<int:pk>", views.SingleReviewView.as_view())
+```
+
+_Listing: URL pattern using pk for DetailView._
+
+> **Important:** `DetailView` expects the URL parameter to be named `pk` (not `id`). If the URL uses `<int:id>`, Django will not be able to look up the object automatically.
+
+By default, `DetailView` passes the object to the template under the lowercase model name (e.g., `review`) or `object`. The existing `single_review.html` template works without changes because it already uses `{{ review.user_name }}`.
+
+### FormView
+
+`FormView` handles the complete form rendering and processing lifecycle—displaying the form on GET, validating on POST, and redirecting on success:
+
+```python
+from django.views.generic.edit import FormView
+from .forms import ReviewForm
+
+
+class ReviewView(FormView):
+    form_class = ReviewForm
+    template_name = "reviews/review.html"
+    success_url = "/thank-you"
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+```
+
+_Listing: ReviewView using FormView._
+
+The `form_valid()` method is called when `is_valid()` returns `True`. Calling `super().form_valid(form)` triggers the redirect to `success_url`. The `form_invalid()` method (not overridden here) re-renders the template with the form and its errors by default.
+
+### CreateView
+
+`CreateView` combines `FormView` with model creation—it can generate the form from the model automatically and saves the instance on successful validation:
+
+```python
+from django.views.generic.edit import CreateView
+from .models import Review
+from .forms import ReviewForm
+
+
+class ReviewView(CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = "reviews/review.html"
+    success_url = "/thank-you"
+```
+
+_Listing: ReviewView using CreateView._
+
+With `CreateView`, the `form_valid()` method does not need to be overridden—the view automatically calls `form.save()` and redirects to `success_url`.
+
+> **Note:** Either `form_class` or `fields` must be specified, but not both. Using `fields = '__all__'` generates a basic form from the model without custom labels or error messages. Using `form_class` provides full control over the form's appearance and validation.
+
+### UpdateView
+
+`UpdateView` works identically to `CreateView` but pre-populates the form with the existing record's data. It expects a `pk` or `slug` parameter in the URL to identify the record being edited:
+
+```python
+# reviews/views.py
+from django.views.generic.edit import CreateView, UpdateView
+from .models import Review
+from .forms import ReviewForm
+
+
+class UpdateReviewView(UpdateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = "reviews/review.html"
+    success_url = "/reviews"
+```
+
+_Listing: UpdateReviewView using UpdateView._
+
+The same template used for `CreateView` can be reused—`UpdateView` pre-populates the form fields with the existing record's values. The URL pattern must include the primary key:
+
+```python
+# reviews/urls.py (add to urlpatterns)
+path("reviews/<int:pk>/edit", views.UpdateReviewView.as_view())
+```
+
+_Listing: URL pattern for updating a review._
+
+When the form is submitted, `UpdateView` calls `form.save()` on the existing instance (performing an `UPDATE` rather than an `INSERT`) and redirects to `success_url`.
+
+### DeleteView
+
+`DeleteView` renders a confirmation page on GET and deletes the record on POST. It requires a `success_url` to redirect to after deletion:
+
+```python
+# reviews/views.py
+from django.views.generic.edit import DeleteView
+from django.urls import reverse_lazy
+from .models import Review
+
+
+class DeleteReviewView(DeleteView):
+    model = Review
+    template_name = "reviews/review_confirm_delete.html"
+    success_url = reverse_lazy("review-list")
+```
+
+_Listing: DeleteReviewView using DeleteView._
+
+> **Note:** `reverse_lazy` is used instead of `reverse` because `success_url` is evaluated at class definition time (when URL patterns may not yet be loaded). `reverse_lazy` defers the URL resolution until it is actually needed.
+
+The confirmation template displays the record details and a form with a submit button:
+
+```html
+<pre>
+<!-- reviews/templates/reviews/review_confirm_delete.html -->
+{% extends "reviews/base.html" %}
+
+{% block title %}Delete Review{% endblock %}
+
+{% block content %}
+  <h1>Are you sure?</h1>
+  <p>Do you want to delete the review by "{{ review.user_name }}"?</p>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="/reviews">Cancel</a>
+  </form>
+{% endblock %}
+</pre>
+```
+
+_Listing: Delete confirmation template._
+
+```python
+# reviews/urls.py (add to urlpatterns)
+path("reviews/<int:pk>/delete", views.DeleteReviewView.as_view())
+```
+
+_Listing: URL pattern for deleting a review._
+
+By default, `DeleteView` passes the object to the template under the lowercase model name (e.g., `review`) or `object`, consistent with `DetailView`.
+
+_Table: Summary of Django generic class-based views._
+
+| View           | Base Class                  | Purpose                                         |
+| :------------- | :-------------------------- | :---------------------------------------------- |
+| `View`         | `django.views.View`         | Base class with manual `get()`/`post()` methods |
+| `TemplateView` | `generic.base.TemplateView` | Renders a template with optional context        |
+| `ListView`     | `generic.ListView`          | Displays a list of model instances              |
+| `DetailView`   | `generic.DetailView`        | Displays a single model instance                |
+| `FormView`     | `generic.edit.FormView`     | Handles form display, validation, and redirect  |
+| `CreateView`   | `generic.edit.CreateView`   | Creates and saves a new model instance via form |
+| `UpdateView`   | `generic.edit.UpdateView`   | Edits an existing model instance via form       |
+| `DeleteView`   | `generic.edit.DeleteView`   | Deletes a model instance after confirmation     |
+
+---
+
+## File Handling
+
+Django provides a layered approach to handling file uploads—from low-level access via `request.FILES` to high-level model-backed storage with `FileField` and `ImageField`. This section builds a profile image upload feature to demonstrate each layer.
+
+### Setting Up the Profiles App
+
+A new app is created to manage user profiles:
+
+```bash
+python manage.py startapp profiles
+```
+
+_Listing: Creating the profiles app._
+
+```python
+# settings.py
+INSTALLED_APPS = [
+    # ... existing apps ...
+    'profiles',
+]
+```
+
+_Listing: Registering the profiles app in settings._
+
+### Raw File Uploads with request.FILES
+
+**The upload form.** File uploads require the `enctype="multipart/form-data"` attribute on the `<form>` element. Without it, the browser sends only the filename rather than the file contents:
+
+```html
+<pre>
+<!-- profiles/templates/profiles/create_profile.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Profile</title>
+  <link rel="stylesheet" href="{% static "profiles/styles.css" %}">
+</head>
+<body>
+  <form action="/profiles/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image" />
+    <button>Upload!</button>
+  </form>
+</body>
+</html>
+</pre>
+```
+
+_Listing: Upload form with multipart encoding._
+
+**The view.** Uploaded files are accessed through `request.FILES`, which is a dictionary-like object mapping field names to `UploadedFile` instances. Large files are read in chunks to avoid loading the entire file into memory:
+
+```python
+# profiles/views.py
+from django.shortcuts import render
+from django.views import View
+from django.http import HttpResponseRedirect
+
+
+def store_file(file):
+    with open("temp/image.jpg", "wb+") as dest:
+        for chunk in file.chunks():
+            dest.write(chunk)
+
+
+class CreateProfileView(View):
+    def get(self, request):
+        return render(request, "profiles/create_profile.html")
+
+    def post(self, request):
+        store_file(request.FILES["image"])
+        return HttpResponseRedirect("/profiles")
+```
+
+_Listing: View handling raw file upload with chunked writing._
+
+```python
+# profiles/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.CreateProfileView.as_view())
+]
+```
+
+_Listing: URL configuration for the profiles app._
+
+> **Note:** The `temp/` directory must be created manually inside the project root (outside any app folder). This raw approach writes all uploads to the same filename, which is not suitable for production—it is shown here only to demonstrate the low-level `request.FILES` API.
+
+### Using Django Forms for File Uploads
+
+The upload can be improved by using a Django form with `FileField`, which provides automatic validation:
+
+```python
+# profiles/forms.py
+from django import forms
+
+
+class ProfileForm(forms.Form):
+    user_image = forms.FileField()
+```
+
+_Listing: Form class with FileField._
+
+The template is updated to render the form object:
+
+```html
+<pre>
+<!-- profiles/templates/profiles/create_profile.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Profile</title>
+  <link rel="stylesheet" href="{% static "profiles/styles.css" %}">
+</head>
+<body>
+  <form action="/profiles/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <button>Upload!</button>
+  </form>
+</body>
+</html>
+</pre>
+```
+
+_Listing: Template rendering the form with FileField._
+
+The view is updated to instantiate the form with both `request.POST` and `request.FILES`. File data is not included in `request.POST`—it must be passed separately:
+
+```python
+# profiles/views.py
+from django.shortcuts import render
+from django.views import View
+from django.http import HttpResponseRedirect
+from .forms import ProfileForm
+
+
+def store_file(file):
+    with open("temp/image.jpg", "wb+") as dest:
+        for chunk in file.chunks():
+            dest.write(chunk)
+
+
+class CreateProfileView(View):
+    def get(self, request):
+        form = ProfileForm()
+        return render(request, "profiles/create_profile.html", {
+            "form": form
+        })
+
+    def post(self, request):
+        submitted_form = ProfileForm(request.POST, request.FILES)
+
+        if submitted_form.is_valid():
+            store_file(request.FILES["user_image"])
+            return HttpResponseRedirect("/profiles")
+
+        return render(request, "profiles/create_profile.html", {
+            "form": submitted_form
+        })
+```
+
+_Listing: View processing file upload through a Django form._
+
+> **Important:** When instantiating a form that includes file fields, `request.FILES` must be passed as the second argument: `ProfileForm(request.POST, request.FILES)`. Omitting `request.FILES` causes the form to report the file field as empty, and `is_valid()` will fail.
+
+### Model-Based File Storage with FileField
+
+Rather than manually writing files to disk, Django can manage file storage automatically through model fields. The `FileField` stores the file on disk and saves its path in the database.
+
+**Defining the model:**
+
+```python
+# profiles/models.py
+from django.db import models
+
+
+class UserProfile(models.Model):
+    image = models.FileField(upload_to="images")
+```
+
+_Listing: UserProfile model with FileField._
+
+The `upload_to` argument specifies a subdirectory within the media root where uploaded files are stored.
+
+After defining the model, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the UserProfile migration._
+
+**Configuring the media root.** The `MEDIA_ROOT` setting defines the filesystem directory where uploaded files are stored:
+
+```python
+# settings.py
+MEDIA_ROOT = BASE_DIR / "uploads"
+```
+
+_Listing: Configuring the media root directory._
+
+With this configuration, a file uploaded through the `image` field with `upload_to="images"` is stored at `<project_root>/uploads/images/<filename>`.
+
+**Updating the view to save through the model:**
+
+```python
+# profiles/views.py
+from django.shortcuts import render
+from django.views import View
+from django.http import HttpResponseRedirect
+from .forms import ProfileForm
+from .models import UserProfile
+
+
+class CreateProfileView(View):
+    def get(self, request):
+        form = ProfileForm()
+        return render(request, "profiles/create_profile.html", {
+            "form": form
+        })
+
+    def post(self, request):
+        submitted_form = ProfileForm(request.POST, request.FILES)
+
+        if submitted_form.is_valid():
+            profile = UserProfile(image=request.FILES["user_image"])
+            profile.save()
+            return HttpResponseRedirect("/profiles")
+
+        return render(request, "profiles/create_profile.html", {
+            "form": submitted_form
+        })
+```
+
+_Listing: View saving uploaded files through the UserProfile model._
+
+**Inspecting stored files in the shell.** The `FileField` provides attributes for accessing the file's path, URL, and size:
+
+```python
+>>> from profiles.models import UserProfile
+>>> UserProfile.objects.all()
+<QuerySet [<UserProfile: UserProfile object (1)>]>
+>>> UserProfile.objects.all()[0].image
+<FieldFile: images/me_kthmaSa.jpg>
+>>> UserProfile.objects.all()[0].image.path
+'.../django-project/uploads/images/me_kthmaSa.jpg'
+>>> UserProfile.objects.all()[0].image.size
+125067
+```
+
+_Listing: Inspecting file attributes in the Django shell._
+
+> **Note:** When multiple files with the same name are uploaded, Django automatically appends a random suffix to avoid overwriting existing files (e.g., `me.jpg` becomes `me_kthmaSa.jpg`).
+
+### Using ImageField for Image Validation
+
+`ImageField` is a subclass of `FileField` that validates that the uploaded file is a valid image (using the Pillow library). It rejects non-image files during validation:
+
+```python
+# profiles/models.py
+from django.db import models
+
+
+class UserProfile(models.Model):
+    image = models.ImageField(upload_to="images")
+```
+
+_Listing: UserProfile model with ImageField._
+
+`ImageField` requires the Pillow library:
+
+```bash
+pip install Pillow
+```
+
+_Listing: Installing the Pillow image processing library._
+
+The form should also be updated to use `ImageField` for client-side and server-side validation:
+
+```python
+# profiles/forms.py
+from django import forms
+
+
+class ProfileForm(forms.Form):
+    user_image = forms.ImageField()
+```
+
+_Listing: Form with ImageField for image validation._
+
+### Simplifying with CreateView
+
+The entire upload flow can be reduced to a single `CreateView`:
+
+```python
+# profiles/views.py
+from django.views.generic.edit import CreateView
+from .models import UserProfile
+
+
+class CreateProfileView(CreateView):
+    template_name = "profiles/create_profile.html"
+    model = UserProfile
+    fields = "__all__"
+    success_url = "/profiles"
+```
+
+_Listing: CreateProfileView using CreateView._
+
+`CreateView` automatically handles form generation, file processing, model saving, and redirection. The `enctype="multipart/form-data"` attribute must still be present on the template's `<form>` element.
+
+### Displaying Uploaded Files
+
+**The list view and template.** A `ListView` displays all uploaded profile images:
+
+```python
+# profiles/views.py
+from django.views.generic.edit import CreateView
+from django.views.generic import ListView
+from .models import UserProfile
+
+
+class CreateProfileView(CreateView):
+    template_name = "profiles/create_profile.html"
+    model = UserProfile
+    fields = "__all__"
+    success_url = "/profiles"
+
+
+class ProfilesView(ListView):
+    model = UserProfile
+    template_name = "profiles/user_profiles.html"
+    context_object_name = "profiles"
+```
+
+_Listing: ProfilesView listing all user profiles._
+
+```html
+<pre>
+<!-- profiles/templates/profiles/user_profiles.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profiles</title>
+</head>
+<body>
+  <ul>
+    {% for profile in profiles %}
+      <li>
+        <img src="{{ profile.image.url }}">
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
+</pre>
+```
+
+_Listing: Template displaying uploaded images._
+
+The `{{ profile.image.url }}` attribute returns the URL path to the file, constructed from the `MEDIA_URL` setting.
+
+**Configuring media URL and serving files.** Two settings control how uploaded files are accessed via URL:
+
+```python
+# settings.py
+MEDIA_ROOT = BASE_DIR / "uploads"
+MEDIA_URL = "/user-media/"
+```
+
+_Listing: Configuring MEDIA_ROOT and MEDIA_URL._
+
+- **`MEDIA_ROOT`** — The filesystem path where files are stored (e.g., `<project>/uploads/`).
+- **`MEDIA_URL`** — The URL prefix used to serve the files (e.g., `/user-media/images/me.jpg`).
+
+**Serving media files in development.** Django's development server does not serve media files by default. The `static()` helper must be added to the project-level URL configuration:
+
+```python
+# project/urls.py
+from django.contrib import admin
+from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("", include("reviews.urls")),
+    path("profiles/", include("profiles.urls"))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+_Listing: Project-level URLs with media file serving._
+
+The `static()` function maps the `MEDIA_URL` prefix to the `MEDIA_ROOT` directory, allowing the development server to serve uploaded files. In production, media files should be served by the web server (e.g., Nginx or Apache) or a cloud storage service rather than through Django.
+
+**Updated app-level URLs:**
+
+```python
+# profiles/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.CreateProfileView.as_view()),
+    path("list", views.ProfilesView.as_view())
+]
+```
+
+_Listing: Profiles app URL configuration with list view._
+
+---
+
 ## Sessions and Cookies
 
 ### Cookies
@@ -3920,6 +4831,99 @@ _Table 3.16: Django session methods._
 | `del request.session['key']`          | Delete a specific key from the session      |
 | `request.session.flush()`             | Clear all session data                      |
 | `request.session.set_expiry(seconds)` | Set the session expiration time             |
+
+### Practical Example — Storing Favourites with Sessions
+
+This example extends the reviews application by allowing users to mark a review as their favourite. The favourite review ID is stored in the session, persisting across page navigations without requiring authentication or a database model.
+
+**Updating the detail template.** A form is added to the single review page that submits the review's ID to a favourite endpoint:
+
+```html
+<pre>
+{% extends "reviews/base.html" %}
+
+{% block title %}Review Detail{% endblock %}
+
+{% block content %}
+  <h1>{{ review.user_name }}</h1>
+  <p>Rating: {{ review.rating }}</p>
+  <p>{{ review.review_text }}</p>
+  <form action="/reviews/favorite" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="review_id" value="{{ review.id }}">
+    <button>Favorite</button>
+  </form>
+{% endblock %}
+</pre>
+```
+
+_Listing: Detail template with a favourite button._
+
+The `review.id` is passed as a hidden input field. When the user clicks "Favorite", the form submits a POST request containing the review's primary key.
+
+**Creating the AddFavoriteView.** The view reads the submitted review ID and stores it in the session:
+
+```python
+# reviews/views.py
+from django.views import View
+from django.http import HttpResponseRedirect
+
+
+class AddFavoriteView(View):
+    def post(self, request):
+        review_id = request.POST["review_id"]
+        request.session["favorite_review"] = review_id
+        return HttpResponseRedirect("/reviews/" + review_id)
+```
+
+_Listing: View storing the favourite review ID in the session._
+
+The `request.session["favorite_review"] = review_id` line stores the review ID in the server-side session. The user is then redirected back to the review's detail page.
+
+**Updating the URL configuration.** The favourite endpoint must be registered before the `<int:pk>` pattern, because Django evaluates URL patterns in order—`reviews/favorite` would otherwise match `<int:pk>` and raise a `ValueError`:
+
+```python
+# reviews/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.ReviewView.as_view()),
+    path("thank-you", views.ThankYouView.as_view()),
+    path("reviews", views.ReviewsListView.as_view()),
+    path("reviews/favorite", views.AddFavoriteView.as_view()),
+    path("reviews/<int:pk>", views.SingleReviewView.as_view())
+]
+```
+
+_Listing: URL configuration with the favourite endpoint before the detail pattern._
+
+**Reading the session in the detail view.** The `SingleReviewView` is updated to check whether the current review is the user's favourite by comparing the session value against the loaded review's ID:
+
+```python
+# reviews/views.py
+from django.views.generic import DetailView
+from .models import Review
+
+
+class SingleReviewView(DetailView):
+    template_name = "reviews/single_review.html"
+    model = Review
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        loaded_review = self.object
+        request = self.request
+        favorite_id = request.session.get("favorite_review")
+        context["is_favorite"] = favorite_id == str(loaded_review.id)
+        return context
+```
+
+_Listing: Detail view checking the session for favourite status._
+
+> **Note:** The comparison uses `str(loaded_review.id)` because values submitted through HTML forms are always strings, and Django's session serialiser preserves the original type. Since `request.POST["review_id"]` returns a string (e.g., `"3"`) and this string is stored in the session, it must be compared against the string representation of the integer primary key to avoid a type mismatch (`"3" != 3`).
+
+The `is_favorite` context variable can then be used in the template to conditionally display a visual indicator (e.g., a filled star icon or a "This is your favourite" message).
 
 ### Sessions versus Cookies
 
