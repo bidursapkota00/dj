@@ -7680,3 +7680,741 @@ When the user is not authenticated, the `@login_required` decorator redirects to
 However, when the user is authenticated (i.e., has already logged in via the admin panel), the browser automatically includes the session cookie with the forged request. Because `@csrf_exempt` disables token validation, Django accepts the request as legitimate and the attacker's data is inserted into the database. This demonstrates why CSRF is dangerous: the attack exploits the browser's automatic cookie-sending behaviour, not any flaw in the user's credentials.
 
 ---
+
+## Building a Blog Application
+
+This section brings together the concepts covered throughout the guide—URL routing, templates, template inheritance, static files, template includes, and context data—by building a multi-page blog application from scratch.
+
+### Project Setup
+
+A new Django project and app are created:
+
+```bash
+django-admin startproject my_site
+cd my_site
+python manage.py startapp blog
+```
+
+_Listing: Creating the blog project and app._
+
+```python
+# my_site/settings.py
+INSTALLED_APPS = [
+    # ... existing apps ...
+    'blog',
+]
+```
+
+_Listing: Registering the blog app in settings._
+
+### URL Configuration
+
+**App-level URLs.** Three routes are defined: the starting page, the all-posts page, and individual post detail pages identified by a slug:
+
+```python
+# blog/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.starting_page, name="starting-page"),
+    path("posts", views.posts, name="posts-page"),
+    path("posts/<slug:slug>", views.post_detail,
+         name="post-detail-page")  # /posts/my-first-post
+]
+```
+
+_Listing: Blog app URL configuration with named routes._
+
+**Project-level URLs.** The blog app is included at the root:
+
+```python
+# my_site/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("", include("blog.urls"))
+]
+```
+
+_Listing: Project-level URL configuration._
+
+### Initial Views
+
+The views are defined as stubs that will be fleshed out incrementally:
+
+```python
+# blog/views.py
+from django.shortcuts import render
+
+
+def starting_page(request):
+    return render(request, "blog/index.html")
+
+
+def posts(request):
+    return render(request, "blog/all-posts.html")
+
+
+def post_detail(request, slug):
+    return render(request, "blog/post-detail.html")
+```
+
+_Listing: Initial view stubs rendering templates._
+
+### Base Template and Template Inheritance
+
+A project-level base template defines the shared HTML structure. The navigation is placed in the base template so it appears on every page:
+
+```html
+<pre>
+<!-- templates/base.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static "app.css" %}">
+  {% block css_files %}{% endblock %}
+</head>
+<body>
+  <header id="main-navigation">
+    <h1><a href="{% url "starting-page" %}">Bidur' Blog</a></h1>
+    <nav>
+      <a href="{% url "posts-page" %}">All Posts</a>
+    </nav>
+  </header>
+
+  {% block content %}
+  {% endblock %}
+</body>
+</html>
+</pre>
+```
+
+_Listing: Base template with navigation, static CSS, and block definitions._
+
+The `{% block css_files %}` block allows child templates to inject page-specific stylesheets. The `{% url %}` tags generate URLs from named route patterns, decoupling the templates from hardcoded paths.
+
+### Global Static Files
+
+A project-level `static/` directory is configured for styles shared across all apps:
+
+```python
+# my_site/settings.py
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+```
+
+_Listing: Configuring the project-level static files directory._
+
+The global stylesheet sets up typography and resets:
+
+```css
+/* static/app.css */
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: "Open Sans", "Lato", sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Lato", sans-serif;
+  font-weight: bold;
+}
+```
+
+_Listing: Global stylesheet with font imports and resets._
+
+### The Starting Page
+
+The index page features a hero section, a latest-posts grid, and an about section:
+
+```html
+<pre>
+<!-- blog/templates/blog/index.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Blog
+{% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "blog/post.css" %}" />
+  <link rel="stylesheet" href="{% static "blog/index.css" %}" />
+{% endblock %}
+
+{% block content %}
+<section id="welcome">
+  <header>
+    <img src="{% static "blog/images/bidur.png" %}" alt="Bidur - The Author Of This Blog" />
+    <h2>BIDUR'S BLOG</h2>
+  </header>
+  <p>Hi, I am Bidur and I love to blog about tech and the world!</p>
+</section>
+
+<section id="latest-posts">
+  <h2>My Latest Thoughts</h2>
+
+  <ul>
+    {% for post in posts %}
+      {% include "blog/includes/post.html" %}
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="about">
+  <h2>What I Do</h2>
+  <p>
+    I love programming, I love to help others and I enjoy exploring new
+    technologies in general!
+  </p>
+  <p>
+    My goal is to keep on growing as a developer - and if I could help you do
+    the same, I'd be very happy!
+  </p>
+</section>
+{% endblock %}
+</pre>
+```
+
+_Listing: Starting page template with hero, latest posts, and about sections._
+
+**Index page styles:**
+
+```css
+/* blog/static/blog/index.css */
+#main-navigation {
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#main-navigation a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+#main-navigation a:hover,
+#main-navigation a:active {
+  color: #cf79f1;
+}
+
+#main-navigation h1 a:hover,
+#main-navigation h1 a:active {
+  color: white;
+}
+
+#welcome {
+  background: linear-gradient(to right top, #6305dd, #390281);
+  padding: 6rem 12%;
+}
+
+#welcome header {
+  display: flex;
+  align-items: flex-start;
+  margin: 3rem auto;
+}
+
+#welcome img {
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
+  object-position: top;
+  border: 5px solid white;
+  border-radius: 12px;
+  background-color: #ffe1bf;
+  transform: rotateZ(-5deg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#welcome h2 {
+  font-size: 3.5rem;
+  margin: 0 0 0 2rem;
+  color: #e4e4e4;
+  width: 10rem;
+}
+
+#welcome p {
+  color: white;
+  font-size: 1.5rem;
+}
+
+#latest-posts {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 60rem;
+  margin: -6rem auto 2rem auto;
+  box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.4);
+}
+
+#latest-posts h2 {
+  text-align: center;
+}
+
+#latest-posts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+#latest-posts li {
+  flex: 1;
+}
+
+#about {
+  text-align: center;
+  padding: 3rem;
+  background-color: #e48900;
+  margin-top: 5rem;
+}
+
+#about h2 {
+  font-size: 3rem;
+}
+
+#about p {
+  font-size: 1.5rem;
+  color: #353535;
+}
+```
+
+_Listing: Index page CSS with hero gradient, post grid, and about section styling._
+
+### Template Includes — Reusable Post Snippet
+
+A reusable post snippet is created as an include template. This avoids duplicating the post card markup across the index page and the all-posts page:
+
+```html
+<pre>
+<!-- blog/templates/blog/includes/post.html -->
+{% load static %}
+
+<li>
+  <article class="post">
+    <a href="{% url "post-detail-page" post.slug %}">
+      <img src="{% static "blog/images/"|add:post.image %}" alt="{{ post.title }}" />
+      <div class="post__content">
+        <h3>{{ post.title }}</h3>
+        <p>
+          {{ post.excerpt }}
+        </p>
+      </div>
+    </a>
+  </article>
+</li>
+</pre>
+```
+
+_Listing: Reusable post card include template._
+
+The `{% static "blog/images/"|add:post.image %}` syntax concatenates the static path prefix with the dynamic image filename using the `add` template filter. Each post card links to the detail page using `{% url "post-detail-page" post.slug %}`.
+
+**Post card styles (shared between pages):**
+
+```css
+/* blog/static/blog/post.css */
+.post {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.post a {
+  text-decoration: none;
+  color: black;
+  transition: all 0.2s ease;
+  padding: 1rem;
+}
+
+.post a:hover,
+.post a:active {
+  transform: scale(1.1);
+  background-color: #390281;
+  color: white;
+}
+
+.post img {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.post h3 {
+  margin: 0.25rem 0;
+}
+
+.post time {
+  color: #666666;
+  margin: 0.25rem;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.post:hover time,
+.post:active time {
+  color: white;
+}
+```
+
+_Listing: Shared post card CSS._
+
+### The All Posts Page
+
+The all-posts page displays every post in a responsive grid:
+
+```html
+<pre>
+<!-- blog/templates/blog/all-posts.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+All My Posts
+{% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "blog/post.css" %}" />
+  <link rel="stylesheet" href="{% static "blog/all-posts.css" %}" />
+{% endblock %}
+
+{% block content %}
+<section id="all-posts">
+  <h2>My Collected Posts</h2>
+  <ul>
+    {% for post in all_posts %}
+      {% include "blog/includes/post.html" %}
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
+</pre>
+```
+
+_Listing: All posts page template._
+
+**All-posts page styles:**
+
+```css
+/* blog/static/blog/all-posts.css */
+body {
+  background-color: #e7e7e7;
+}
+
+#main-navigation {
+  background-color: #390281;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#all-posts {
+  margin: 7rem auto;
+  width: 90%;
+  max-width: 60rem;
+}
+
+#all-posts h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #2e2e2e;
+  margin: 3rem 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1.5rem;
+}
+
+.post img {
+  width: 7rem;
+  height: 7rem;
+}
+
+.post a {
+  height: 22rem;
+  transform-origin: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  background-color: white;
+}
+```
+
+_Listing: All posts page CSS with responsive grid layout._
+
+### The Post Detail Page
+
+The detail page displays the full content of a single post:
+
+```html
+<pre>
+<!-- blog/templates/blog/post-detail.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "blog/post-detail.css" %}" />
+{% endblock %}
+
+{% block content %}
+<section id="summary">
+  <h2>{{ post.title }}</h2>
+  <article>
+    <img src="{% static "blog/images/"|add:post.image %}" alt="{{ post.title }}" />
+    <address>By {{ post.author }}</address>
+    <div>Last updated on <time>{{ post.date|date:"d M Y" }}</time></div>
+  </article>
+</section>
+
+<main>
+  {{ post.content|linebreaks }}
+</main>
+{% endblock %}
+</pre>
+```
+
+_Listing: Post detail template with date formatting and linebreaks filter._
+
+The `{{ post.date|date:"d M Y" }}` filter formats the Python `date` object into a human-readable string (e.g., "21 Jul 2021"). The `{{ post.content|linebreaks }}` filter converts plain text line breaks into `<p>` and `<br>` HTML tags.
+
+**Post detail styles:**
+
+```css
+/* blog/static/blog/post-detail.css */
+body {
+  background-color: #e7e7e7;
+}
+
+#main-navigation {
+  background-color: #390281;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#summary {
+  margin: 8rem auto 3rem auto;
+  padding: 2rem;
+  width: 90%;
+  max-width: 90rem;
+  border-radius: 16px;
+  background-color: #5706c0;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  height: 22rem;
+}
+
+#summary h2 {
+  color: white;
+  font-size: 4.5rem;
+}
+
+#summary article {
+  position: absolute;
+  top: 2rem;
+  right: 3rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-align: right;
+  color: white;
+}
+
+#summary article img {
+  width: 12rem;
+  height: 12rem;
+  border-radius: 12px;
+  transform: rotateZ(5deg);
+  border: 5px solid white;
+  margin-bottom: 1rem;
+}
+
+#summary address {
+  font-weight: bold;
+}
+
+#summary time {
+  font-weight: bold;
+}
+
+main {
+  width: 90%;
+  max-width: 90rem;
+  margin: 3rem auto;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+```
+
+_Listing: Post detail CSS with summary banner and content card._
+
+### Adding Dummy Data and Dynamic Rendering
+
+With the templates in place, the views are updated to pass dynamic data. Before connecting a database, a list of dictionaries serves as temporary data:
+
+```python
+# blog/views.py
+from datetime import date
+from django.shortcuts import render
+
+all_posts = [
+    {
+        "slug": "hike-in-the-mountains",
+        "image": "mountains.jpg",
+        "author": "Bidur",
+        "date": date(2021, 7, 21),
+        "title": "Mountain Hiking",
+        "excerpt": "There's nothing like the views you get when hiking in the mountains! And I wasn't even prepared for what happened whilst I was enjoying the view!",
+        "content": """
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+        """
+    },
+    {
+        "slug": "programming-is-fun",
+        "image": "coding.jpg",
+        "author": "Bidur",
+        "date": date(2022, 3, 10),
+        "title": "Programming Is Great!",
+        "excerpt": "Did you ever spend hours searching that one error in your code? Yep - that's what happened to me yesterday...",
+        "content": """
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+        """
+    },
+    {
+        "slug": "into-the-woods",
+        "image": "woods.jpg",
+        "author": "Bidur",
+        "date": date(2020, 8, 5),
+        "title": "Nature At Its Best",
+        "excerpt": "Nature is amazing! The amount of inspiration I get when walking in nature is incredible!",
+        "content": """
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis nobis
+          aperiam est praesentium, quos iste consequuntur omnis exercitationem quam
+          velit labore vero culpa ad mollitia? Quis architecto ipsam nemo. Odio.
+        """
+    }
+]
+```
+
+_Listing: Dummy post data as a list of dictionaries._
+
+**Updated views with dynamic data.** The starting page sorts posts by date and displays the three most recent. The all-posts page passes every post. The detail page looks up a single post by slug:
+
+```python
+# blog/views.py (continued)
+
+def get_date(post):
+    return post['date']
+
+
+def starting_page(request):
+    sorted_posts = sorted(all_posts, key=get_date)
+    latest_posts = sorted_posts[-3:]
+    return render(request, "blog/index.html", {
+        "posts": latest_posts
+    })
+
+
+def posts(request):
+    return render(request, "blog/all-posts.html", {
+        "all_posts": all_posts
+    })
+
+
+def post_detail(request, slug):
+    identified_post = next(
+        post for post in all_posts if post['slug'] == slug)
+    return render(request, "blog/post-detail.html", {
+        "post": identified_post
+    })
+```
+
+_Listing: Views with sorting, filtering, and slug-based lookup._
+
+The `sorted()` function with a `key` function sorts the posts by date in ascending order. Slicing with `[-3:]` takes the last three (most recent) posts. The `next()` function with a generator expression finds the first post whose slug matches the URL parameter.
+
+### Custom 404 Page
+
+A custom 404 template provides a user-friendly error page when a URL does not match any pattern:
+
+```html
+<pre>
+<!-- templates/404.html -->
+{% extends "base.html" %}
+
+{% block title %}
+We didn't find that page!
+{% endblock %}
+
+{% block content %}
+  <h2>We're sorry!</h2>
+  <p>But we couldn't find that page!</p>
+{% endblock %}
+</pre>
+```
+
+_Listing: Custom 404 error page template._
+
+> **Note:** Django only uses custom error templates when `DEBUG = False` in settings. During development, Django displays its own detailed error page instead. The 404 template must be placed in the project-level `templates/` directory (not inside an app's template folder).
