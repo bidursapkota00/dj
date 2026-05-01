@@ -1773,6 +1773,178 @@ _Listing 3.81: URL configurations for the book outlet app._
 
 This example demonstrates the complete data flow in Django's MTV architecture: the Model defines the data structure, the View retrieves data from the database and prepares it for display, and the Template renders the HTML presentation. The `{% url %}` tag generates links to named URL patterns, and the `{% if %}` tag provides conditional rendering based on model attributes.
 
+### Using Slugs Instead of IDs
+
+Integer primary keys (e.g., `/books/3`) are functional but expose internal database identifiers in the URL. Slugs provide human-readable, SEO-friendly URLs (e.g., `/books/harry-potter-1`) that are both more descriptive and more stable.
+
+**Updating the model.** A `SlugField` is added to the `Book` model. The `save()` method is overridden to auto-generate the slug from the title using Django's `slugify` utility, and `get_absolute_url()` is defined to return the canonical URL for each book:
+
+```python
+# book_outlet/models.py
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.urls import reverse
+from django.utils.text import slugify
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=50)
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)])
+    author = models.CharField(null=True, max_length=100)
+    is_bestselling = models.BooleanField(default=False)
+    # Harry Potter 1 => harry-potter-1
+    slug = models.SlugField(default="", null=False, db_index=True, unique=True)
+
+    def get_absolute_url(self):
+        return reverse("book-detail", args=[self.slug])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.title} ({self.rating})"
+```
+
+_Listing: Updated Book model with SlugField, get_absolute_url, and overridden save._
+
+After adding the `slug` field, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the slug migration._
+
+**Populating slugs for existing records.** Because the `slug` field is derived from the title during `save()`, existing records must be re-saved to generate their slugs:
+
+```python
+Book.objects.get(title="Harry Potter 1").save()
+Book.objects.get(title="Harry Potter 1").slug
+# 'harry-potter-1'
+
+Book.objects.get(title="Lord of the Rings").save()
+Book.objects.get(title="Lord of the Rings").slug
+# 'lord-of-the-rings'
+
+Book.objects.get(title="My Story").save()
+Book.objects.get(title="Some random book").save()
+```
+
+_Listing: Re-saving existing records to populate slugs._
+
+**Updating the URL configuration.** The URL pattern is changed from `<int:id>` to `<slug:slug>`, which matches URL-friendly strings containing letters, numbers, hyphens, and underscores:
+
+```python
+# book_outlet/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.index),
+    path("<slug:slug>", views.book_detail, name="book-detail")
+]
+```
+
+_Listing: URL configuration updated to use slug-based routing._
+
+**Updating the view.** The view parameter and lookup field are changed from `id` to `slug`:
+
+```python
+# book_outlet/views.py
+def book_detail(request, slug):
+    book = get_object_or_404(Book, slug=slug)
+    return render(request, "book_outlet/book_detail.html", {
+        "title": book.title,
+        "author": book.author,
+        "rating": book.rating,
+        "is_bestseller": book.is_bestselling
+    })
+```
+
+_Listing: Detail view updated to accept and look up by slug._
+
+**Updating the index template.** Instead of manually constructing URLs with `{% url %}`, the template now calls `get_absolute_url` on each book instance, which returns the slug-based URL:
+
+```html
+<pre>
+{% extends "book_outlet/base.html" %}
+
+{% block title %}
+  All Books
+{% endblock %}
+
+{% block content %}
+  <ul>
+    {% for book in books %}
+      <li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> (Rating: {{ book.rating }})</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+</pre>
+```
+
+_Listing: Index template using get_absolute_url for slug-based links._
+
+The `get_absolute_url` method is the recommended Django convention for obtaining a model instance's canonical URL. Using it in templates decouples the URL structure from the template logic—if the URL pattern changes, only the model method and URL configuration need to be updated.
+
+### Adding a Summary with Aggregation
+
+The index page can be enhanced with summary statistics by using Django's aggregation functions alongside the existing QuerySet.
+
+**Updating the view.** The `Avg` aggregation function computes the average rating across all books. The `count()` method returns the total number of records:
+
+```python
+# book_outlet/views.py
+from django.db.models import Avg
+
+def index(request):
+    books = Book.objects.all().order_by("-rating")
+    num_books = books.count()
+    avg_rating = books.aggregate(Avg("rating"))  # {'rating__avg': 3.0}
+
+    return render(request, "book_outlet/index.html", {
+        "books": books,
+        "total_number_of_books": num_books,
+        "average_rating": avg_rating
+    })
+```
+
+_Listing: Index view with aggregation for book count and average rating._
+
+The `aggregate()` method returns a dictionary whose keys follow the pattern `<field>__<function>` (e.g., `rating__avg`). Unlike QuerySet methods such as `filter()` and `order_by()`, `aggregate()` evaluates immediately and returns a plain dictionary rather than a QuerySet.
+
+**Updating the index template.** The summary statistics are rendered below the book list:
+
+```html
+<pre>
+{% extends "book_outlet/base.html" %}
+
+{% block title %}
+  All Books
+{% endblock %}
+
+{% block content %}
+  <ul>
+    {% for book in books %}
+      <li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> (Rating: {{ book.rating }})</li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <p>Total Number Of Books: {{ total_number_of_books }}</p>
+  <p>Average Rating: {{ average_rating.rating__avg }}</p>
+{% endblock %}
+</pre>
+```
+
+_Listing: Index template displaying summary statistics._
+
+The `average_rating.rating__avg` syntax accesses the `rating__avg` key from the dictionary returned by `aggregate()`. The dot notation in Django templates functions as both attribute access and dictionary key lookup.
+
 > **Reference:** The official Django documentation provides exhaustive references for [Model Fields](https://docs.djangoproject.com/en/5.0/ref/models/fields/), [Validators](https://docs.djangoproject.com/en/5.0/ref/validators/), [QuerySets](https://docs.djangoproject.com/en/5.0/ref/models/querysets/), and [Field Lookups](https://docs.djangoproject.com/en/5.0/ref/models/lookups/).
 
 ---
