@@ -2037,6 +2037,333 @@ _Listing: Using prepopulated_fields to auto-fill the slug from the title._
 
 ---
 
+## Relationships
+
+Relational databases model real-world associations between entities through foreign keys and join tables. Django's ORM provides three field types that map directly to the three fundamental relationship cardinalities: one-to-many, one-to-one, and many-to-many.
+
+_Table: Django relationship field types._
+
+| Cardinality      | Django Field      | Database Implementation                       | Example                               |
+| :--------------- | :---------------- | :-------------------------------------------- | :------------------------------------ |
+| **One-to-Many**  | `ForeignKey`      | Foreign key column on the "many" side         | An author has many books              |
+| **One-to-One**   | `OneToOneField`   | Foreign key column with a unique constraint   | An author has one address             |
+| **Many-to-Many** | `ManyToManyField` | Intermediate join table created automatically | A book is published in many countries |
+
+### One-to-Many Relationships (ForeignKey)
+
+A one-to-many relationship exists when a single record in one table is associated with multiple records in another. In Django, this is represented using `ForeignKey` on the "many" side of the relationship.
+
+**Defining the models.** The `Author` model is created as a separate entity, and the `Book` model references it through a `ForeignKey`:
+
+```python
+# book_outlet/models.py
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.full_name()
+
+
+class Book(models.Model):
+    # ... other fields ...
+    author = models.ForeignKey(
+        Author, on_delete=models.CASCADE, null=True, related_name="books")
+```
+
+_Listing: Author model and ForeignKey relationship on Book._
+
+The `ForeignKey` field accepts several important arguments:
+
+- **`on_delete`** — Defines the behaviour when the referenced record is deleted. `models.CASCADE` deletes all related books when an author is deleted. Other options include `models.SET_NULL` (sets the field to NULL), `models.PROTECT` (prevents deletion), and `models.SET_DEFAULT` (sets to the default value).
+- **`null=True`** — Allows a book to exist without an author.
+- **`related_name="books"`** — Customises the reverse accessor name on the `Author` model (defaults to `book_set`).
+
+After defining the models, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the relationship migration._
+
+**Working with ForeignKey in the shell.** The following session demonstrates creating related records and querying across relationships:
+
+```python
+>>> from book_outlet.models import Book, Author
+
+# Create an author
+>>> jkrowling = Author(first_name="J.K.", last_name="Rowling")
+>>> jkrowling.save()
+
+>>> Author.objects.all()
+<QuerySet [<Author: Author object (1)>]>
+>>> Author.objects.all()[0].first_name
+'J.K.'
+
+# Create a book linked to the author
+>>> hp1 = Book(title="Harry Potter 1", rating=5, is_bestselling=True,
+...            slug="harry-potter-1", author=jkrowling)
+>>> hp1.save()
+```
+
+_Listing: Creating related Author and Book records._
+
+**Forward access (Book → Author).** Accessing the `ForeignKey` field on a book instance returns the related `Author` object:
+
+```python
+>>> harrypotter = Book.objects.get(title="Harry Potter 1")
+>>> harrypotter.author
+<Author: Author object (1)>
+>>> harrypotter.author.first_name
+'J.K.'
+>>> harrypotter.author.last_name
+'Rowling'
+```
+
+_Listing: Accessing the related author from a book instance._
+
+**Cross-relationship filtering.** Django's double-underscore syntax allows filtering across relationships, including chained lookups:
+
+```python
+>>> books_by_rowling = Book.objects.filter(author__last_name="Rowling")
+>>> books_by_rowling
+<QuerySet [<Book: Harry Potter 1 (5)>]>
+
+>>> books_by_rowling = Book.objects.filter(author__last_name__contains="wling")
+>>> books_by_rowling
+<QuerySet [<Book: Harry Potter 1 (5)>]>
+```
+
+_Listing: Filtering books by author attributes using double-underscore syntax._
+
+**Reverse access (Author → Books).** By default, Django creates a reverse manager named `<model>_set` on the related model:
+
+```python
+>>> jkr = Author.objects.get(first_name="J.K.")
+>>> jkr.book_set.all()
+<QuerySet [<Book: Harry Potter 1 (5)>]>
+```
+
+_Listing: Reverse access using the default book_set manager._
+
+When `related_name="books"` is specified on the `ForeignKey`, the reverse manager uses that name instead:
+
+```python
+>>> jkr.books.all()
+<QuerySet [<Book: Harry Potter 1 (5)>]>
+
+>>> jkr.books.get(title="Harry Potter 1")
+<Book: Harry Potter 1 (5)>
+
+>>> jkr.books.filter(rating__gt=3)
+<QuerySet [<Book: Harry Potter 1 (5)>]>
+```
+
+_Listing: Reverse access using the custom related_name._
+
+The reverse manager supports the same QuerySet methods as any other manager—`all()`, `filter()`, `get()`, `count()`, and so on.
+
+**Registering in the admin.** To manage authors through the admin panel:
+
+```python
+# book_outlet/admin.py
+admin.site.register(Author)
+```
+
+_Listing: Registering the Author model with the admin site._
+
+### One-to-One Relationships (OneToOneField)
+
+A one-to-one relationship exists when each record in one table corresponds to exactly one record in another table. In Django, this is represented using `OneToOneField`, which is functionally a `ForeignKey` with `unique=True`.
+
+**Defining the models.** An `Address` model is created, and the `Author` model is updated with a `OneToOneField` referencing it:
+
+```python
+# book_outlet/models.py
+class Address(models.Model):
+    street = models.CharField(max_length=80)
+    postal_code = models.CharField(max_length=5)
+    city = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.street}, {self.postal_code}, {self.city}"
+
+    class Meta:
+        verbose_name_plural = "Address Entries"
+
+
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    address = models.OneToOneField(
+        Address, on_delete=models.CASCADE, null=True)
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.full_name()
+```
+
+_Listing: Address model with OneToOneField on Author._
+
+The `class Meta` inner class configures model-level metadata. The `verbose_name_plural` attribute overrides the default pluralisation (which would produce "Addresss") to display "Address Entries" in the admin panel.
+
+After defining the models, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the one-to-one relationship migration._
+
+**Working with OneToOneField in the shell.** The following session demonstrates assigning addresses to authors and accessing the relationship in both directions:
+
+```python
+>>> from book_outlet.models import Author, Address, Book
+
+# Create address records
+>>> addr1 = Address(street="Some Street", postal_code="12345", city="London")
+>>> addr2 = Address(street="Another Street", postal_code="67890", city="New York")
+>>> addr1.save()
+>>> addr2.save()
+
+# Assign an address to an author
+>>> jkr = Author.objects.get(first_name="J.K.")
+>>> jkr.address = addr1
+>>> jkr.save()
+```
+
+_Listing: Creating addresses and assigning one to an author._
+
+**Forward access (Author → Address).** Accessing the `OneToOneField` returns the related object directly (not a manager):
+
+```python
+>>> jkr.address
+<Address: Address object (1)>
+>>> jkr.address.street
+'Some Street'
+```
+
+_Listing: Accessing the related address from an author._
+
+**Reverse access (Address → Author).** Unlike `ForeignKey`, the reverse side of a `OneToOneField` returns a single object rather than a manager, accessed using the lowercase model name:
+
+```python
+>>> Address.objects.all()[0].author
+<Author: J.K. Rowling>
+>>> Address.objects.all()[0].author.first_name
+'J.K.'
+```
+
+_Listing: Reverse access from an address to its author._
+
+**Registering in the admin.** To manage addresses through the admin panel:
+
+```python
+# book_outlet/admin.py
+admin.site.register(Address)
+```
+
+_Listing: Registering the Address model with the admin site._
+
+### Many-to-Many Relationships (ManyToManyField)
+
+A many-to-many relationship exists when each record in one table can be associated with multiple records in another table, and vice versa. In Django, this is represented using `ManyToManyField`. Django automatically creates an intermediate join table to manage the associations.
+
+**Defining the models.** A `Country` model is created, and the `Book` model is updated with a `ManyToManyField`:
+
+```python
+# book_outlet/models.py
+class Country(models.Model):
+    name = models.CharField(max_length=80)
+    code = models.CharField(max_length=2)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Countries"
+
+
+class Book(models.Model):
+    # ... other fields ...
+    published_countries = models.ManyToManyField(Country, null=False)
+```
+
+_Listing: Country model with ManyToManyField on Book._
+
+After defining the models, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the many-to-many relationship migration._
+
+**Working with ManyToManyField in the shell.** Unlike `ForeignKey` and `OneToOneField`, many-to-many relationships cannot be set through the constructor. Instead, the `add()` method is used after both records have been saved:
+
+```python
+>>> from book_outlet.models import Country, Book
+
+# Create a country
+>>> germany = Country(name="Germany", code="DE")
+>>> germany.save()
+
+# Add the country to a book's published_countries
+>>> mys = Book.objects.all()[1]
+>>> mys.published_countries.add(germany)
+```
+
+_Listing: Adding a many-to-many relationship between a book and a country._
+
+> **Important:** Both records must be saved to the database before calling `add()`. Attempting to add an unsaved object raises a `ValueError`.
+
+**Forward access (Book → Countries).** The `ManyToManyField` provides a manager for querying related records:
+
+```python
+>>> mys.published_countries.all()
+<QuerySet [<Country: Country object (1)>]>
+
+>>> mys.published_countries.filter(code="DE")
+<QuerySet [<Country: Country object (1)>]>
+
+>>> mys.published_countries.filter(code="UK")
+<QuerySet []>
+```
+
+_Listing: Querying a book's published countries._
+
+**Reverse access (Country → Books).** The reverse manager uses the default `<model>_set` naming convention. A custom `related_name` can be specified on the `ManyToManyField` to override this:
+
+```python
+>>> ger = Country.objects.all()[0]
+>>> ger.book_set.all()
+<QuerySet [<Book: My Story (3)>]>
+>>> ger.books.all()
+AttributeError: 'Country' object has no attribute 'books'
+```
+
+_Listing: Reverse access from a country to its books._
+
+**Registering in the admin.** To manage countries through the admin panel:
+
+```python
+# book_outlet/admin.py
+admin.site.register(Country)
+```
+
+_Listing: Registering the Country model with the admin site._
+
+---
+
 ## Forms
 
 ### HTML Forms and HTTP Methods
