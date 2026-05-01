@@ -2695,6 +2695,620 @@ _Listing 3.96: Cross-field validation in the clean method._
 
 _Listing 3.97: Displaying non-field validation errors in a template._
 
+### Building a Review Application — A Practical Walkthrough
+
+This section applies the concepts covered above by building a complete review application from scratch. The walkthrough progresses through several stages: starting with raw HTML forms and manual validation, then refactoring to use the Django Forms API, then upgrading to `ModelForm` for database persistence, and finally converting to class-based views.
+
+**Step 1: Create the app and register it.** A new Django app named `reviews` is created and added to `INSTALLED_APPS`:
+
+```bash
+python manage.py startapp reviews
+```
+
+_Listing: Creating the reviews app._
+
+```python
+# settings.py
+INSTALLED_APPS = [
+    # ... existing apps ...
+    'reviews',
+]
+```
+
+_Listing: Registering the reviews app in settings._
+
+**Step 2: Configure URLs.** The project-level URL configuration includes the reviews app's URLs:
+
+```python
+# project/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("", include("reviews.urls"))
+]
+```
+
+_Listing: Project-level URL configuration including the reviews app._
+
+The app-level URL configuration defines two routes—one for the review form and one for the thank-you page:
+
+```python
+# reviews/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.review),
+    path("thank-you", views.thank_you)
+]
+```
+
+_Listing: App-level URL configuration for the reviews app._
+
+**Step 3: Create the templates.** The review form template collects a username via a standard HTML form:
+
+```html
+<!-- reviews/templates/reviews/review.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Review</title>
+  </head>
+  <body>
+    <form action="/" method="POST">
+      {% csrf_token %}
+      <label for="username">Your name</label>
+      <input id="username" name="username" type="text" />
+      <button type="submit">Send</button>
+    </form>
+  </body>
+</html>
+```
+
+_Listing: Initial review form template with raw HTML._
+
+The thank-you page confirms successful submission:
+
+```html
+<!-- reviews/templates/reviews/thank_you.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You!</title>
+  </head>
+  <body>
+    <h1>Thank you!</h1>
+  </body>
+</html>
+```
+
+_Listing: Thank-you page template._
+
+**Step 4: Create the views with manual validation.** The view handles both GET and POST requests. On POST, it reads the submitted data from `request.POST` and redirects to the thank-you page:
+
+```python
+# reviews/views.py
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
+
+def review(request):
+    if request.method == 'POST':
+        entered_username = request.POST['username']
+        print(entered_username)
+        return HttpResponseRedirect("/thank-you")
+
+    return render(request, "reviews/review.html")
+
+
+def thank_you(request):
+    return render(request, "reviews/thank_you.html")
+```
+
+_Listing: Initial views with basic POST handling._
+
+**Adding manual validation.** Validation logic can be added directly in the view, with error state passed to the template:
+
+```python
+# reviews/views.py
+def review(request):
+    if request.method == 'POST':
+        entered_username = request.POST['username']
+
+        if entered_username == "" or len(entered_username) >= 100:
+            return render(request, "reviews/review.html", {
+                "has_error": True
+            })
+        print(entered_username)
+        return HttpResponseRedirect("/thank-you")
+
+    return render(request, "reviews/review.html", {
+        "has_error": False
+    })
+```
+
+_Listing: View with manual validation logic._
+
+The template displays an error message when validation fails:
+
+```html
+<pre>
+<form action="/" method="POST">
+    {% csrf_token %}
+    {% if has_error %}
+      <p>This form is invalid - please enter a valid username!</p>
+    {% endif %}
+    <label for="username">Your name</label>
+    <input id="username" name="username" type="text">
+    <button type="submit">Send</button>
+</form>
+</pre>
+```
+
+_Listing: Template with conditional error display._
+
+While this approach works, it requires writing validation logic manually for every field. The Django Forms API provides a far more scalable solution.
+
+**Step 5: Refactor to use the Django Forms API.** A form class is created to replace the raw HTML form:
+
+```python
+# reviews/forms.py
+from django import forms
+
+
+class ReviewForm(forms.Form):
+    user_name = forms.CharField()
+```
+
+_Listing: Basic Django form class._
+
+The view is updated to use the form class. On POST, the form is instantiated with `request.POST` and validated using `is_valid()`. On GET, an empty form is created:
+
+```python
+# reviews/views.py
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from .forms import ReviewForm
+
+
+def review(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            print(form.cleaned_data)
+            return HttpResponseRedirect("/thank-you")
+
+    else:
+        form = ReviewForm()
+
+    return render(request, "reviews/review.html", {
+        "form": form
+    })
+```
+
+_Listing: View refactored to use the Django Forms API._
+
+The template renders the form using the `{{ form }}` template variable:
+
+```html
+<pre>
+<form action="/" method="POST">
+  {% csrf_token %}
+  {{ form }}
+  <button type="submit">Send</button>
+</form>
+</pre>
+```
+
+_Listing: Template rendering the form using Django's form object._
+
+> **Note:** When `is_valid()` fails, the `form` variable retains the submitted data and the associated error messages. Because the `else` block (which creates an empty form) is skipped on a failed POST, the template re-renders with the populated form, preserving user input and displaying errors automatically.
+
+**Step 6: Customise labels and error messages.** The form class is enhanced with custom labels, length constraints, and error messages:
+
+```python
+# reviews/forms.py
+from django import forms
+
+
+class ReviewForm(forms.Form):
+    user_name = forms.CharField(label="Your Name", max_length=100, error_messages={
+        "required": "Your name must not be empty!",
+        "max_length": "Please enter a shorter name!"
+    })
+```
+
+_Listing: Form with custom labels and error messages._
+
+**Step 7: Render fields manually with error styling.** For finer control over layout and error display, each field can be rendered individually in the template:
+
+```html
+<pre>
+<form action="/" method="POST">
+  {% csrf_token %}
+  <div class="form-control {% if form.user_name.errors %}errors{% endif %}">
+    {{ form.user_name.label_tag }}
+    {{ form.user_name }}
+    {{ form.user_name.errors }}
+  </div>
+  <button type="submit">Send</button>
+</form>
+</pre>
+```
+
+_Listing: Manual field rendering with conditional error classes._
+
+The `{{ field.label_tag }}` renders the `<label>` element, `{{ field }}` renders the input element, and `{{ field.errors }}` renders a `<ul class="errorlist">` containing any validation errors for that field.
+
+**Step 8: Add static CSS.** A stylesheet is created to style the form and error states:
+
+```css
+/* reviews/static/reviews/styles.css */
+body {
+  font-family: sans-serif;
+  margin: 0;
+}
+
+form {
+  margin: 3rem auto;
+  width: 90%;
+  max-width: 30rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+button {
+  cursor: pointer;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  background-color: #1f0050;
+  color: white;
+  border: 1px solid #1f0050;
+}
+
+button:hover,
+button:active {
+  background-color: #320777;
+  border-color: #320777;
+}
+
+.form-control {
+  margin-bottom: 1rem;
+}
+
+.form-control input {
+  font: inherit;
+  padding: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  display: block;
+  width: 10rem;
+}
+
+.form-control input:focus {
+  border-color: #1f0050;
+  outline: none;
+  background-color: #f4eeff;
+}
+
+.form-control label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.errorlist {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  color: #680000;
+}
+
+.errors input {
+  border-color: #680000;
+  background-color: #fde3e3;
+}
+
+.errors label {
+  color: #680000;
+}
+```
+
+_Listing: CSS stylesheet for the review form._
+
+The template loads the static file using Django's `{% load static %}` tag:
+
+```html
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Review</title>
+  <link rel="stylesheet" href="{% static "reviews/styles.css" %}">
+</head>
+<!-- body with form -->
+</html>
+```
+
+_Listing: Template loading static CSS._
+
+**Step 9: Expand the form with additional fields.** The form is extended with a text area for feedback and an integer field for the rating:
+
+```python
+# reviews/forms.py
+from django import forms
+
+
+class ReviewForm(forms.Form):
+    user_name = forms.CharField(label="Your Name", max_length=100, error_messages={
+        "required": "Your name must not be empty!",
+        "max_length": "Please enter a shorter name!"
+    })
+    review_text = forms.CharField(
+        label="Your Feedback", widget=forms.Textarea, max_length=200)
+    rating = forms.IntegerField(label="Your Rating", min_value=1, max_value=5)
+```
+
+_Listing: Expanded form with textarea and integer fields._
+
+The `widget=forms.Textarea` argument overrides the default `TextInput` widget for `CharField`, rendering a `<textarea>` element instead. The `min_value` and `max_value` arguments on `IntegerField` provide built-in range validation.
+
+**Rendering each field manually.** With multiple fields, each can be rendered individually with its own error styling:
+
+```html
+<pre>
+<form action="/" method="POST">
+  {% csrf_token %}
+  <div class="form-control {% if form.user_name.errors %}errors{% endif %}">
+    {{ form.user_name.label_tag }}
+    {{ form.user_name }}
+    {{ form.user_name.errors }}
+  </div>
+  <div class="form-control {% if form.review_text.errors %}errors{% endif %}">
+    {{ form.review_text.label_tag }}
+    {{ form.review_text }}
+    {{ form.review_text.errors }}
+  </div>
+  <div class="form-control {% if form.rating.errors %}errors{% endif %}">
+    {{ form.rating.label_tag }}
+    {{ form.rating }}
+    {{ form.rating.errors }}
+  </div>
+  <button type="submit">Send</button>
+</form>
+</pre>
+```
+
+_Listing: Manual rendering of each form field with error styling._
+
+This approach provides full control over the layout and ordering of individual fields, but becomes repetitive as the number of fields grows.
+
+**Rendering multiple fields with a loop.** Rather than rendering each field manually, Django forms are iterable—looping over the form yields each `BoundField`:
+
+```html
+<pre>
+<form action="/" method="POST">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-control {% if field.errors %}errors{% endif %}">
+      {{ field.label_tag }}
+      {{ field }}
+      {{ field.errors }}
+    </div>
+  {% endfor %}
+  <button type="submit">Send</button>
+</form>
+</pre>
+```
+
+_Listing: Rendering form fields using a loop._
+
+This approach scales automatically as new fields are added to the form class.
+
+**Step 10: Create the model and save form data.** A `Review` model is created to persist the submitted reviews:
+
+```python
+# reviews/models.py
+from django.db import models
+
+
+class Review(models.Model):
+    user_name = models.CharField(max_length=100)
+    review_text = models.TextField()
+    rating = models.IntegerField()
+```
+
+_Listing: Review model definition._
+
+After defining the model, migrations must be generated and applied:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+_Listing: Creating and applying the Review model migration._
+
+The view is updated to create a `Review` instance from the validated form data and save it to the database:
+
+```python
+# reviews/views.py
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from .forms import ReviewForm
+from .models import Review
+
+
+def review(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            review = Review(
+                user_name=form.cleaned_data['user_name'],
+                review_text=form.cleaned_data['review_text'],
+                rating=form.cleaned_data['rating'])
+            review.save()
+            return HttpResponseRedirect("/thank-you")
+
+    else:
+        form = ReviewForm()
+
+    return render(request, "reviews/review.html", {
+        "form": form
+    })
+```
+
+_Listing: View saving validated form data to the database._
+
+The saved data can be verified in the Django shell:
+
+```python
+>>> from reviews.models import Review
+>>> Review.objects.all()
+<QuerySet [<Review: Review object (1)>]>
+>>> Review.objects.all()[0].user_name
+'Bidur'
+```
+
+_Listing: Verifying saved review data in the shell._
+
+**Step 11: Refactor to ModelForm.** Since the form fields mirror the model fields exactly, the form can be converted to a `ModelForm`. This eliminates the need to define fields manually—they are derived directly from the model:
+
+```python
+# reviews/forms.py
+from django import forms
+from .models import Review
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = '__all__'
+        # exclude = ['owner_comment']
+        labels = {
+            "user_name": "Your Name",
+            "review_text": "Your Feedback",
+            "rating": "Your Rating"
+        }
+        error_messages = {
+            "user_name": {
+                "required": "Your name must not be empty!",
+                "max_length": "Please enter a shorter name!"
+            }
+        }
+```
+
+_Listing: ReviewForm refactored to ModelForm._
+
+The `Meta` inner class configures the `ModelForm`:
+
+- **`model`** — Specifies which model to generate the form from.
+- **`fields = '__all__'`** — Includes all model fields. Alternatively, a list of specific field names can be provided.
+- **`exclude`** — A list of fields to omit from the form (mutually exclusive with `fields`).
+- **`labels`** — A dictionary mapping field names to custom label text.
+- **`error_messages`** — A nested dictionary mapping field names to custom error messages.
+
+**Simplified view with ModelForm.** The `ModelForm` provides a `save()` method that creates and saves a model instance directly, eliminating the manual field-by-field assignment:
+
+```python
+# reviews/views.py
+def review(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/thank-you")
+
+    else:
+        form = ReviewForm()
+
+    return render(request, "reviews/review.html", {
+        "form": form
+    })
+```
+
+_Listing: Simplified view using ModelForm.save()._
+
+**Updating existing records.** To update an existing record rather than creating a new one, pass the `instance` argument when constructing the form:
+
+```python
+def review(request):
+    if request.method == 'POST':
+        existing_data = Review.objects.get(pk=1)
+        form = ReviewForm(request.POST, instance=existing_data)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/thank-you")
+```
+
+_Listing: Updating an existing record using the instance argument._
+
+When `instance` is provided, `form.save()` calls `UPDATE` on the existing record instead of `INSERT`.
+
+**Step 12: Convert to class-based views.** Django's `View` class provides a structured alternative to function-based views. Each HTTP method is handled by a dedicated method (`get()`, `post()`), eliminating the need for `if request.method` branching:
+
+```python
+# reviews/views.py
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.views import View
+from .forms import ReviewForm
+
+
+class ReviewView(View):
+    def get(self, request):
+        form = ReviewForm()
+
+        return render(request, "reviews/review.html", {
+            "form": form
+        })
+
+    def post(self, request):
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/thank-you")
+
+        return render(request, "reviews/review.html", {
+            "form": form
+        })
+```
+
+_Listing: Review view refactored to a class-based view._
+
+The URL configuration is updated to use `as_view()`, which converts the class into a callable view function:
+
+```python
+# reviews/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.ReviewView.as_view()),
+    path("thank-you", views.thank_you)
+]
+```
+
+_Listing: URL configuration using a class-based view._
+
+The `as_view()` method inspects the incoming request's HTTP method and dispatches it to the corresponding method on the class (`get()`, `post()`, `put()`, etc.). If the request method does not have a corresponding handler, Django returns a `405 Method Not Allowed` response.
+
 ### Comprehensive Form Validation — A Complete Walkthrough
 
 This section presents a complete registration form application that demonstrates server-side validation for a variety of input types. The form collects a user's name, gender, hobbies, appointment date and time, country, résumé file, email, phone number, password, and password confirmation. The validation requirements are as follows:
