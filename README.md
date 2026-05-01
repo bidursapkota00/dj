@@ -2000,6 +2000,41 @@ _Listing 3.84: Customising the admin panel with filters, column display, and sea
 
 The `list_filter` attribute adds filtering widgets to the sidebar, `list_display` controls which columns are shown in the list view, and `search_fields` adds a search bar that queries the specified fields.
 
+### Handling Slug Fields in the Admin
+
+When a model includes a `SlugField` that is auto-generated from another field (such as the title), there are two common approaches to managing it in the admin panel.
+
+**Approach 1: Hide the field entirely.** Setting `editable=False` on the model field removes it from all forms, including the admin. The slug is generated exclusively by the overridden `save()` method:
+
+```python
+# book_outlet/models.py
+slug = models.SlugField(default="", null=False, db_index=True, unique=True, editable=False)
+```
+
+_Listing: Making the slug field non-editable._
+
+With `editable=False`, the field does not appear in the admin add/edit forms at all, preventing accidental manual edits.
+
+**Approach 2: Auto-populate in the admin.** The `prepopulated_fields` option in `ModelAdmin` provides a live preview of the slug as the user types the source field. The slug is generated client-side using JavaScript and can still be manually adjusted before saving:
+
+```python
+# book_outlet/admin.py
+from django.contrib import admin
+from .models import Book
+
+class BookAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("title",)}
+    list_filter = ("author", "rating",)
+    list_display = ("title", "author",)
+    search_fields = ['title',]
+
+admin.site.register(Book, BookAdmin)
+```
+
+_Listing: Using prepopulated_fields to auto-fill the slug from the title._
+
+> **Note:** When using `prepopulated_fields`, the overridden `save()` method that calls `slugify()` on the model should be removed (or made conditional), because the slug is already being set by the admin form. If both mechanisms are active, the `save()` override will always overwrite any manual slug edits made in the admin.
+
 ---
 
 ## Forms
