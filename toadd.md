@@ -2369,3 +2369,711 @@ We didn't find that page!
 {% endblock %}
 </pre>
 ```
+
+---
+
+---
+
+---
+
+---
+
+```py
+from django.db import models
+from django.core.validators import MinLengthValidator
+
+# Create your models here.
+
+
+class Tag(models.Model):
+    caption = models.CharField(max_length=20)
+
+    def __str__(self):
+      return self.caption
+
+
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email_address = models.EmailField()
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.full_name()
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=150)
+    excerpt = models.CharField(max_length=200)
+    image = models.ImageField(upload_to="posts", null=True)
+    date = models.DateField(auto_now=True)
+    slug = models.SlugField(unique=True, db_index=True)
+    content = models.TextField(validators=[MinLengthValidator(10)])
+    author = models.ForeignKey(
+        Author, on_delete=models.SET_NULL, null=True, related_name="posts")
+    tags = models.ManyToManyField(Tag)
+
+    def __str__(self):
+        return self.title
+```
+
+```py
+from django.contrib import admin
+
+from .models import Post, Author, Tag
+
+# Register your models here
+
+
+class PostAdmin(admin.ModelAdmin):
+    list_filter = ("author", "tags", "date",)
+    list_display = ("title", "date", "author",)
+    prepopulated_fields = {"slug": ("title",)}
+
+
+admin.site.register(Post, PostAdmin)
+admin.site.register(Author)
+admin.site.register(Tag)
+```
+
+makemigrations and migrate
+
+createsuperuser
+
+add array data from admin panel
+
+```py
+from django.shortcuts import render, get_object_or_404
+
+from .models import Post
+
+# Create your views here.
+
+
+def starting_page(request):
+    latest_posts = Post.objects.all().order_by("-date")[:3]
+    return render(request, "blog/index.html", {
+      "posts": latest_posts
+    })
+
+
+def posts(request):
+    all_posts = Post.objects.all().order_by("-date")
+    return render(request, "blog/all-posts.html", {
+      "all_posts": all_posts
+    })
+
+
+def post_detail(request, slug):
+    identified_post = get_object_or_404(Post, slug=slug)
+    return render(request, "blog/post-detail.html", {
+      "post": identified_post,
+      "post_tags": identified_post.tags.all()
+    })
+```
+
+```html
+<!-- post detail -->
+<address>
+  By <a href="mailto:{{ post.author.email_address }}">{{ post.author }}</a>
+</address>
+```
+
+```css
+#summary h2 {
+  /* ... */
+  margin-bottom: 0.25rem;
+}
+#summary a {
+  color: white;
+  text-decoration: none;
+}
+.tag {
+  background-color: white;
+  color: #390281;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+```
+
+---
+
+---
+
+---
+
+---
+
+install pillow
+
+```py
+# post model
+image = models.ImageField(upload_to="posts", null=True)
+```
+
+edit from admin panel and upload each posts image
+
+```py
+MEDIA_ROOT = BASE_DIR / "uploads"
+MEDIA_URL = "/files/"
+```
+
+```html
+<!-- post includes and in post detail -->
+<img src="{{ post.image.url }}" alt="{{ post.title }}" />
+```
+
+```py
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("", include("blog.urls"))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+---
+
+```py
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, DetailView
+
+from .models import Post
+
+# Create your views here.
+
+class StartingPageView(ListView):
+    template_name = "blog/index.html"
+    model = Post
+    ordering = ["-date"]
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        data = queryset[:3]
+        return data
+
+
+class AllPostsView(ListView):
+    template_name = "blog/all-posts.html"
+    model = Post
+    ordering = ["-date"]
+    context_object_name = "all_posts"
+
+
+class SinglePostView(DetailView):
+    template_name = "blog/post-detail.html"
+    model = Post
+
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context["post_tags"] = self.object.tags.all()
+        return context
+```
+
+```py
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.StartingPageView.as_view(), name="starting-page"),
+    path("posts", views.AllPostsView.as_view(), name="posts-page"),
+    path("posts/<slug:slug>", views.SinglePostView.as_view(),
+         name="post-detail-page")  # /posts/my-first-post
+]
+```
+
+```py
+class Comment(models.Model):
+    user_name = models.CharField(max_length=120)
+    user_email = models.EmailField()
+    text = models.TextField(max_length=400)
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="comments")
+```
+
+```py
+from django import forms
+
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        exclude = ["post"]
+        labels = {
+          "user_name": "Your Name",
+          "user_email": "Your Email",
+          "text": "Your Comment"
+        }
+```
+
+```py
+class SinglePostView(DetailView):
+    template_name = "blog/post-detail.html"
+    model = Post
+
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context["post_tags"] = self.object.tags.all()
+        context["comment_form"] = CommentForm()
+        return context
+```
+
+```html
+<!-- detail page -->
+<section>
+  <form>
+    {{ comment_form }}
+    <button>Save Comment</button>
+  </form>
+</section>
+```
+
+```html
+<section id="comment-form">
+  <h2>Your Comment</h2>
+  <form action="{% url "post-detail-page" post.slug %}" method="POST">
+    {% csrf_token %}
+    {% for form_field in comment_form %}
+      <div class="form-control">
+        {{ form_field.label_tag }}
+        {{ form_field }}
+        {{ form_field.errors }}
+      </div>
+    {% endfor %}
+    <button>Save Comment</button>
+  </form>
+</section>
+```
+
+```css
+#comment-form {
+  margin: 3rem auto;
+  width: 90%;
+  max-width: 40rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  padding: 1rem;
+}
+
+#comment-form button {
+  font: inherit;
+  background-color: #390281;
+  color: white;
+  border: 1px solid #390281;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#comment-form button:hover,
+#comment-form button:active {
+  background-color: #4f0ba7;
+  border-color: #4f0ba7;
+}
+
+.form-control {
+  margin-bottom: 1rem;
+}
+
+.form-control label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control input,
+.form-control textarea {
+  display: block;
+  width: 100%;
+  font: inherit;
+  padding: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+```
+
+```py
+# necessary new imports
+
+class SinglePostView(View):
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+          "post": post,
+          "post_tags": post.tags.all(),
+          "comment_form": CommentForm()
+        }
+        return render(request, "blog/post-detail.html", context)
+
+    def post(self, request, slug):
+        comment_form = CommentForm(request.POST)
+        post = Post.objects.get(slug=slug)
+
+        if comment_form.is_valid():
+          comment = comment_form.save(commit=False)
+          comment.post = post
+          comment.save()
+
+          return HttpResponseRedirect(reverse("post-detail-page", args=[slug]))
+
+        context = {
+          "post": post,
+          "post_tags": post.tags.all(),
+          "comment_form": comment_form
+        }
+        return render(request, "blog/post-detail.html", context)
+```
+
+```text
+>>> from blog.models import Comment
+>>> Comment.objects.all()
+<QuerySet [<Comment: Comment object (1)>]>
+>>> Comment.objects.all()[0].user_name
+'Max'
+>>> Comment.objects.all()[0].text
+'This is awesome!'
+>>> Comment.objects.all()[0].post
+<Post: Post object (1)>
+>>> Comment.objects.all()[0].post.title
+'Mountain Hiking'
+>>> ^D
+```
+
+```html
+<pre>
+{% block content %}
+
+{% if comment_form.errors %}
+  <div id="alert">
+    <h2>Saving the comment failed!</h2>
+    <p>Please check the comment form below the post and fix your erros.</p>
+    <a href="#comment-form">Fix!</a>
+  </div>
+{% endif %}
+
+<!-- ... summary, main -->
+
+<section id="comment-form">
+  <h2>Your Comment</h2>
+  <form action="{% url "post-detail-page" post.slug %}" method="POST">
+    {% csrf_token %}
+    {% for form_field in comment_form %}
+      <div class="form-control {% if form_field.errors %}invalid{% endif %}">
+        {{ form_field.label_tag }}
+        {{ form_field }}
+        {{ form_field.errors }}
+      </div>
+    {% endfor %}
+    <button>Save Comment</button>
+  </form>
+</section>
+{% endblock %}
+</pre>
+```
+
+```css
+.errorlist {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  color: #d6000b;
+}
+
+.invalid label {
+  color: #d6000b;
+}
+
+.invalid input,
+.invalid textarea {
+  border-color: #d6000b;
+  background-color: #ffe6e7;
+}
+
+#alert {
+  margin: 8rem auto 3rem auto;
+  border: 1px solid #d6000b;
+  background-color: #ffe6e7;
+  padding: 1rem;
+  width: 90%;
+  max-width: 40rem;
+}
+
+#alert a {
+  text-decoration: none;
+  border: 1px solid #d6000b;
+  background-color: #d6000b;
+  color: white;
+  padding: 0.25rem 1.5rem;
+  border-radius: 6px;
+}
+```
+
+```py
+class SinglePostView(View):
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+          "post": post,
+          "post_tags": post.tags.all(),
+          "comment_form": CommentForm(),
+          "comments": post.comments.all().order_by("-id")
+        }
+        return render(request, "blog/post-detail.html", context)
+
+    def post(self, request, slug):
+        comment_form = CommentForm(request.POST)
+        post = Post.objects.get(slug=slug)
+
+        if comment_form.is_valid():
+          comment = comment_form.save(commit=False)
+          comment.post = post
+          comment.save()
+
+          return HttpResponseRedirect(reverse("post-detail-page", args=[slug]))
+
+        context = {
+          "post": post,
+          "post_tags": post.tags.all(),
+          "comment_form": comment_form,
+          "comments": post.comments.all().order_by("-id")
+        }
+        return render(request, "blog/post-detail.html", context)
+```
+
+```html
+<pre>
+<section id="comments">
+  <ul>
+    {% for comment in comments %}
+      <li>
+        <h2>{{ comment.user_name }}</h2>
+        <p>{{ comment.text|linebreaks }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+<!-- comment form section -->
+</pre>
+```
+
+```css
+#comments {
+  margin: 3rem auto;
+  width: 90%;
+  max-width: 60rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  padding: 1rem 2rem;
+}
+
+#comments ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#comments li {
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #ccc;
+}
+
+#comments li:last-of-type {
+  border-bottom: none;
+}
+
+#comments h2 {
+  color: #464646;
+}
+```
+
+```py
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("user_name", "post")
+
+admin.site.register(Comment, CommentAdmin)
+```
+
+```py
+class ReadLaterView(View):
+    def post(self, request):
+        stored_posts = request.session.get("stored_posts")
+
+        if stored_posts is None:
+          stored_posts = []
+
+        post_id = int(request.POST["post_id"])
+
+        if post_id not in stored_posts:
+          stored_posts.append(post_id)
+        else: # can do later
+          stored_posts.remove(post_id)
+
+        request.session["stored_posts"] = stored_posts
+
+        return HttpResponseRedirect("/")
+```
+
+```py
+path("read-later", views.ReadLaterView.as_view(), name="read-later")
+```
+
+```html
+<!-- in detail page inside summary section -->
+<pre>
+  <div id="read-later">
+    <form action="{% url "read-later" %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value="{{ post.id }}" name="post_id">
+      <button>
+          Read Later
+      </button>
+    </form>
+  </div>
+  <!-- article -->
+</pre>
+```
+
+```py
+class SinglePostView(View):
+    def is_stored_post(self, request, post_id):
+        stored_posts = request.session.get("stored_posts")
+        if stored_posts is not None:
+          is_saved_for_later = post_id in stored_posts
+        else:
+          is_saved_for_later = False
+
+        return is_saved_for_later
+
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+
+        context = {
+            "post": post,
+            "post_tags": post.tags.all(),
+            "comment_form": CommentForm(),
+            "comments": post.comments.all().order_by("-id"),
+            "saved_for_later": self.is_stored_post(request, post.id) # also for post req context
+        }
+        return render(request, "blog/post-detail.html", context)
+```
+
+```html
+<pre>
+<button>
+  {% if saved_for_later %}
+    Remove from "Read Later" List
+  {% else %}
+    Read Later
+  {% endif %}
+</button>
+</pre>
+```
+
+```html
+<!-- update base template -->
+<nav>
+  <a href="{% url "read-later" %}">Stored Posts</a>
+  <a href="{% url "posts-page" %}">All Posts</a>
+</nav>
+```
+
+```css
+/* app.css */
+#main-navigation a {
+  /* ... */
+  margin-left: 1rem;
+}
+```
+
+```py
+class ReadLaterView(View):
+    def get(self, request):
+        stored_posts = request.session.get("stored_posts")
+
+        context = {}
+
+        if stored_posts is None or len(stored_posts) == 0:
+            context["posts"] = []
+            context["has_posts"] = False
+        else:
+          posts = Post.objects.filter(id__in=stored_posts)
+          context["posts"] = posts
+          context["has_posts"] = True
+
+        return render(request, "blog/stored-posts.html", context)
+```
+
+```html
+<pre>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Stored Posts
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "blog/stored-posts.css" %}">
+{% endblock %}
+
+{% block content %}
+  <section id="stored-posts">
+    {% if not has_posts %}
+      <p>You didn't save any posts for later.</p>
+    {% endif %}
+    <ul>
+      {% for post in posts %}
+        <li><a href="{% url "post-detail-page" post.slug %}">{{ post.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
+</pre>
+```
+
+```css
+#main-navigation {
+  background-color: #390281;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#stored-posts {
+  margin: 8rem auto 3rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background-color: white;
+  width: 90%;
+  max-width: 30rem;
+}
+
+#stored-posts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#stored-posts li {
+  margin: 1rem 0;
+}
+
+#stored-posts a {
+  display: block;
+  padding: 1rem;
+  width: 100%;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  color: #1b1b1b;
+  font-weight: bold;
+}
+
+#stored-posts a:hover,
+#stored-posts a:active {
+  background-color: #ccc;
+}
+```
