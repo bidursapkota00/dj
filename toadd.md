@@ -3077,3 +3077,44 @@ My Stored Posts
   background-color: #ccc;
 }
 ```
+
+---
+
+---
+
+---
+
+---
+
+deployment
+
+debug false or with env vars
+
+allowed hosts manual or with env vars
+
+secret with env vars
+
+static root folder setting and update urls.py (or configure server to serve directly or use bucket with seperate static and media folders)
+
+make sure migrations clean and createsuperuser
+
+freeze requirements
+
+wsgi config
+
+install psycopg2-binary for postgres
+
+```py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': '<your-rds-db-username>',
+        'PASSWORD': '<your-rds-db-user-password>',
+        'HOST': '<your-rds-db-host>',
+        'PORT': '5432'
+    }
+}
+```
+
+inbound rule of database to 0.0.0.0
