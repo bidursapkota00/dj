@@ -2110,8 +2110,7 @@ _Listing: Creating and applying the relationship migration._
 'J.K.'
 
 # Create a book linked to the author
->>> hp1 = Book(title="Harry Potter 1", rating=5, is_bestselling=True,
-...            slug="harry-potter-1", author=jkrowling)
+>>> hp1 = Book(title="Harry Potter 1", rating=5, is_bestselling=True, slug="harry-potter-1", author=jkrowling)
 >>> hp1.save()
 ```
 
@@ -2322,7 +2321,7 @@ _Listing: Creating and applying the many-to-many relationship migration._
 >>> germany.save()
 
 # Add the country to a book's published_countries
->>> mys = Book.objects.all()[1]
+>>> mys = Book.objects.all()[0]
 >>> mys.published_countries.add(germany)
 ```
 
@@ -7687,7 +7686,7 @@ However, when the user is authenticated (i.e., has already logged in via the adm
 
 ## Building a Blog Application
 
-This section brings together the concepts covered throughout the guide—URL routing, templates, template inheritance, static files, template includes, and context data—by building a multi-page blog application from scratch.
+This section brings together the concepts covered throughout the guide—models, admin configuration, URL routing, templates, static files, image uploads, class-based views, forms, comments, and sessions—by building a complete blog application from scratch.
 
 ### Project Setup
 
