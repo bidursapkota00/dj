@@ -2744,7 +2744,7 @@ from . import views
 
 urlpatterns = [
     path("", views.review),
-    path("thank-you", views.thank_you)
+    path("thank-you/", views.thank_you)
 ]
 ```
 
@@ -3304,7 +3304,7 @@ from . import views
 
 urlpatterns = [
     path("", views.ReviewView.as_view()),
-    path("thank-you", views.thank_you)
+    path("thank-you/", views.thank_you)
 ]
 ```
 
@@ -3869,7 +3869,7 @@ from . import views
 
 urlpatterns = [
     path("", views.ReviewView.as_view()),
-    path("thank-you", views.ThankYouView.as_view())
+    path("thank-you/", views.ThankYouView.as_view())
 ]
 ```
 
@@ -3950,7 +3950,7 @@ _Listing: Review list template._
 
 ```python
 # reviews/urls.py (add to urlpatterns)
-path("reviews", views.ReviewsListView.as_view()),
+path("reviews/", views.ReviewsListView.as_view()),
 ```
 
 _Listing: URL pattern for the reviews list._
@@ -4218,6 +4218,7 @@ _Listing: Delete confirmation template._
 
 ```python
 # reviews/urls.py (add to urlpatterns)
+path("reviews/", views.ReviewsListView.as_view(), name='review-list'),
 path("reviews/<int:pk>/delete", views.DeleteReviewView.as_view())
 ```
 
@@ -4298,13 +4299,17 @@ _Listing: Upload form with multipart encoding._
 
 ```python
 # profiles/views.py
+import os
+from django.conf import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponseRedirect
 
 
 def store_file(file):
-    with open("temp/image.jpg", "wb+") as dest:
+    file_path = os.path.join(
+        settings.BASE_DIR, "profiles", "temp", "image.jpg")
+    with open(file_path, "wb+") as dest:
         for chunk in file.chunks():
             dest.write(chunk)
 
@@ -4381,6 +4386,8 @@ The view is updated to instantiate the form with both `request.POST` and `reques
 
 ```python
 # profiles/views.py
+import os
+from django.conf import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponseRedirect
@@ -4388,7 +4395,9 @@ from .forms import ProfileForm
 
 
 def store_file(file):
-    with open("temp/image.jpg", "wb+") as dest:
+    file_path = os.path.join(
+        settings.BASE_DIR, "profiles", "temp", "image.jpg")
+    with open(file_path, "wb+") as dest:
         for chunk in file.chunks():
             dest.write(chunk)
 
@@ -4851,11 +4860,15 @@ This example extends the reviews application by allowing users to mark a review 
   <h1>{{ review.user_name }}</h1>
   <p>Rating: {{ review.rating }}</p>
   <p>{{ review.review_text }}</p>
-  <form action="/reviews/favorite" method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="review_id" value="{{ review.id }}">
-    <button>Favorite</button>
-  </form>
+  {% if is_favorite %}
+    <p>This is my favorite!</p>
+  {% else %}
+    <form action="/reviews/favorite" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="review_id" value="{{ review.id }}">
+      <button>Favorite</button>
+    </form>
+  {% endif %}
 {% endblock %}
 </pre>
 ```
@@ -4892,8 +4905,8 @@ from . import views
 
 urlpatterns = [
     path("", views.ReviewView.as_view()),
-    path("thank-you", views.ThankYouView.as_view()),
-    path("reviews", views.ReviewsListView.as_view()),
+    path("thank-you/", views.ThankYouView.as_view()),
+    path("reviews/", views.ReviewsListView.as_view()),
     path("reviews/favorite", views.AddFavoriteView.as_view()),
     path("reviews/<int:pk>", views.SingleReviewView.as_view())
 ]
@@ -7841,6 +7854,34 @@ h3 {
   font-family: "Lato", sans-serif;
   font-weight: bold;
 }
+
+#main-navigation {
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#main-navigation a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+#main-navigation a:hover,
+#main-navigation a:active {
+  color: #cf79f1;
+}
+
+#main-navigation h1 a:hover,
+#main-navigation h1 a:active {
+  color: white;
+}
 ```
 
 _Listing: Global stylesheet with font imports and resets._
@@ -7904,34 +7945,6 @@ _Listing: Starting page template with hero, latest posts, and about sections._
 
 ```css
 /* blog/static/blog/index.css */
-#main-navigation {
-  width: 100%;
-  height: 5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#main-navigation a {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-}
-
-#main-navigation a:hover,
-#main-navigation a:active {
-  color: #cf79f1;
-}
-
-#main-navigation h1 a:hover,
-#main-navigation h1 a:active {
-  color: white;
-}
-
 #welcome {
   background: linear-gradient(to right top, #6305dd, #390281);
   padding: 6rem 12%;
