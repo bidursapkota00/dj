@@ -5285,7 +5285,7 @@ _Listing: Updated URL configuration with registration._
 
 ## Practical Exercises
 
-This section presents a collection of practical exercises that consolidate the concepts covered in Sections 3.6 through 3.10. Each exercise specifies a problem statement, validation requirements, and a complete solution comprising the model, form, view, template, and URL configuration.
+Each exercise specifies a problem statement, validation requirements, and a complete solution comprising the model, form, view, template, and URL configuration.
 
 ### Exercise: Patient Registration Form
 

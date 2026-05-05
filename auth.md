@@ -49,18 +49,18 @@ The default `User` model (`django.contrib.auth.models.User`) has these fields:
 
 _Table: Default User model fields._
 
-| Field          | Type           | Description                                   |
-| :------------- | :------------- | :-------------------------------------------- |
-| `username`     | CharField(150) | Required. Unique.                             |
-| `password`     | CharField      | Hashed password. Never stored in plain text.  |
-| `email`        | EmailField     | Optional.                                     |
-| `first_name`   | CharField(150) | Optional.                                     |
-| `last_name`    | CharField(150) | Optional.                                     |
-| `is_active`    | BooleanField   | Whether the account is active. Default `True`.|
-| `is_staff`     | BooleanField   | Whether the user can access the admin site.   |
-| `is_superuser` | BooleanField   | Whether the user has all permissions.         |
-| `date_joined`  | DateTimeField  | When the account was created.                 |
-| `last_login`   | DateTimeField  | Last login timestamp.                         |
+| Field          | Type           | Description                                    |
+| :------------- | :------------- | :--------------------------------------------- |
+| `username`     | CharField(150) | Required. Unique.                              |
+| `password`     | CharField      | Hashed password. Never stored in plain text.   |
+| `email`        | EmailField     | Optional.                                      |
+| `first_name`   | CharField(150) | Optional.                                      |
+| `last_name`    | CharField(150) | Optional.                                      |
+| `is_active`    | BooleanField   | Whether the account is active. Default `True`. |
+| `is_staff`     | BooleanField   | Whether the user can access the admin site.    |
+| `is_superuser` | BooleanField   | Whether the user has all permissions.          |
+| `date_joined`  | DateTimeField  | When the account was created.                  |
+| `last_login`   | DateTimeField  | Last login timestamp.                          |
 
 Superusers and staff users are not separate classes—they are regular `User` objects with special flags set.
 
@@ -416,15 +416,15 @@ _Listing: Working with groups._
 
 _Table: Group and permission management methods._
 
-| Operation             | Code                                         |
-| :-------------------- | :------------------------------------------- |
-| Add to group          | `user.groups.add(group)`                     |
-| Remove from group     | `user.groups.remove(group)`                  |
-| Clear all groups      | `user.groups.clear()`                        |
-| Set groups            | `user.groups.set([group1, group2])`          |
-| Add permission        | `user.user_permissions.add(perm)`            |
-| Remove permission     | `user.user_permissions.remove(perm)`         |
-| Clear all permissions | `user.user_permissions.clear()`              |
+| Operation             | Code                                 |
+| :-------------------- | :----------------------------------- |
+| Add to group          | `user.groups.add(group)`             |
+| Remove from group     | `user.groups.remove(group)`          |
+| Clear all groups      | `user.groups.clear()`                |
+| Set groups            | `user.groups.set([group1, group2])`  |
+| Add permission        | `user.user_permissions.add(perm)`    |
+| Remove permission     | `user.user_permissions.remove(perm)` |
+| Clear all permissions | `user.user_permissions.clear()`      |
 
 ---
 
@@ -447,16 +447,16 @@ This registers the following URL patterns:
 
 _Table: Built-in auth URL patterns._
 
-| URL Pattern                                | Name                      | View                       | Default Template                            |
-| :----------------------------------------- | :------------------------ | :------------------------- | :------------------------------------------ |
-| `accounts/login/`                          | `login`                   | `LoginView`                | `registration/login.html`                   |
-| `accounts/logout/`                         | `logout`                  | `LogoutView`               | `registration/logged_out.html`              |
-| `accounts/password_change/`                | `password_change`         | `PasswordChangeView`       | `registration/password_change_form.html`    |
-| `accounts/password_change/done/`           | `password_change_done`    | `PasswordChangeDoneView`   | `registration/password_change_done.html`    |
-| `accounts/password_reset/`                 | `password_reset`          | `PasswordResetView`        | `registration/password_reset_form.html`     |
-| `accounts/password_reset/done/`            | `password_reset_done`     | `PasswordResetDoneView`    | `registration/password_reset_done.html`     |
-| `accounts/reset/<uidb64>/<token>/`         | `password_reset_confirm`  | `PasswordResetConfirmView` | `registration/password_reset_confirm.html`  |
-| `accounts/reset/done/`                     | `password_reset_complete` | `PasswordResetCompleteView`| `registration/password_reset_complete.html` |
+| URL Pattern                        | Name                      | View                        | Default Template                            |
+| :--------------------------------- | :------------------------ | :-------------------------- | :------------------------------------------ |
+| `accounts/login/`                  | `login`                   | `LoginView`                 | `registration/login.html`                   |
+| `accounts/logout/`                 | `logout`                  | `LogoutView`                | `registration/logged_out.html`              |
+| `accounts/password_change/`        | `password_change`         | `PasswordChangeView`        | `registration/password_change_form.html`    |
+| `accounts/password_change/done/`   | `password_change_done`    | `PasswordChangeDoneView`    | `registration/password_change_done.html`    |
+| `accounts/password_reset/`         | `password_reset`          | `PasswordResetView`         | `registration/password_reset_form.html`     |
+| `accounts/password_reset/done/`    | `password_reset_done`     | `PasswordResetDoneView`     | `registration/password_reset_done.html`     |
+| `accounts/reset/<uidb64>/<token>/` | `password_reset_confirm`  | `PasswordResetConfirmView`  | `registration/password_reset_confirm.html`  |
+| `accounts/reset/done/`             | `password_reset_complete` | `PasswordResetCompleteView` | `registration/password_reset_complete.html` |
 
 > **Important:** Django does **not** provide default templates. You must create them yourself in a `registration/` directory inside your templates folder.
 
@@ -495,6 +495,7 @@ _Listing: Customising auth views with keyword arguments._
 Create `templates/registration/login.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block content %}
 <h2>Login</h2>
@@ -511,6 +512,7 @@ Create `templates/registration/login.html`:
 
 <p><a href="{% url 'password_reset' %}">Forgot password?</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: A minimal login template._
@@ -523,15 +525,15 @@ All forms are in `django.contrib.auth.forms`:
 
 _Table: Built-in authentication forms._
 
-| Form                      | Purpose                                       |
-| :------------------------ | :-------------------------------------------- |
-| `AuthenticationForm`      | Login form. Validates username and password.   |
+| Form                      | Purpose                                                    |
+| :------------------------ | :--------------------------------------------------------- |
+| `AuthenticationForm`      | Login form. Validates username and password.               |
 | `UserCreationForm`        | Registration form. Fields: username, password1, password2. |
-| `UserChangeForm`          | Used in admin to edit user details.            |
-| `PasswordChangeForm`      | Change password (requires old password).       |
-| `SetPasswordForm`         | Set new password (no old password required).   |
-| `PasswordResetForm`       | Enter email to receive a reset link.           |
-| `AdminPasswordChangeForm` | Used in admin to change a user's password.     |
+| `UserChangeForm`          | Used in admin to edit user details.                        |
+| `PasswordChangeForm`      | Change password (requires old password).                   |
+| `SetPasswordForm`         | Set new password (no old password required).               |
+| `PasswordResetForm`       | Enter email to receive a reset link.                       |
+| `AdminPasswordChangeForm` | Used in admin to change a user's password.                 |
 
 ### Using UserCreationForm for Registration
 
@@ -554,6 +556,7 @@ def register(request):
 _Listing: Registration view using UserCreationForm._
 
 ```html
+<pre>
 <!-- templates/registration/register.html -->
 {% extends "base.html" %}
 {% block content %}
@@ -565,6 +568,7 @@ _Listing: Registration view using UserCreationForm._
 </form>
 <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Registration template._
@@ -593,12 +597,14 @@ The `django.contrib.auth.context_processors.auth` context processor (enabled by 
 ### {{ user }}
 
 ```html
+<pre>
 {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }}!</p>
   <a href="{% url 'logout' %}">Logout</a>
 {% else %}
   <a href="{% url 'login' %}">Login</a>
 {% endif %}
+</pre>
 ```
 
 _Listing: Using the user variable in templates._
@@ -606,6 +612,7 @@ _Listing: Using the user variable in templates._
 ### {{ perms }}
 
 ```html
+<pre>
 {% if perms.myapp.can_publish %}
   <button>Publish</button>
 {% endif %}
@@ -613,6 +620,7 @@ _Listing: Using the user variable in templates._
 {% if perms.myapp %}
   <p>You have some permissions in myapp.</p>
 {% endif %}
+</pre>
 ```
 
 _Listing: Checking permissions in templates._
@@ -661,7 +669,7 @@ _Listing: Email configuration for password reset._
 
 The password reset email template (`registration/password_reset_email.html`):
 
-```html
+```txt
 Someone requested a password reset for {{ user.get_username }}.
 
 Follow this link to reset your password:
@@ -900,6 +908,7 @@ _Listing: Registration view with auto-login and protected dashboard._
 Create `templates/base.html`:
 
 ```html
+<pre>
 <!DOCTYPE html>
 <html>
 <head>
@@ -921,6 +930,7 @@ Create `templates/base.html`:
   {% block content %}{% endblock %}
 </body>
 </html>
+</pre>
 ```
 
 _Listing: Base template with conditional auth navigation._
@@ -928,6 +938,7 @@ _Listing: Base template with conditional auth navigation._
 Create `templates/registration/login.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
@@ -943,6 +954,7 @@ Create `templates/registration/login.html`:
 <p><a href="{% url 'password_reset' %}">Forgot password?</a></p>
 <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Login template._
@@ -950,6 +962,7 @@ _Listing: Login template._
 Create `templates/registration/register.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
@@ -961,6 +974,7 @@ Create `templates/registration/register.html`:
 </form>
 <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Registration template._
@@ -968,6 +982,7 @@ _Listing: Registration template._
 Create `templates/dashboard.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
@@ -980,6 +995,7 @@ Create `templates/dashboard.html`:
 </ul>
 <p><a href="{% url 'password_change' %}">Change password</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Protected dashboard template._
@@ -987,6 +1003,7 @@ _Listing: Protected dashboard template._
 Create `templates/registration/password_change_form.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block title %}Change Password{% endblock %}
 {% block content %}
@@ -997,6 +1014,7 @@ Create `templates/registration/password_change_form.html`:
   <button type="submit">Change Password</button>
 </form>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Password change template._
@@ -1004,12 +1022,14 @@ _Listing: Password change template._
 Create `templates/registration/password_change_done.html`:
 
 ```html
+<pre>
 {% extends "base.html" %}
 {% block title %}Password Changed{% endblock %}
 {% block content %}
 <h2>Password Changed Successfully</h2>
 <p>Your password has been updated. <a href="{% url 'dashboard' %}">Back to dashboard</a></p>
 {% endblock %}
+</pre>
 ```
 
 _Listing: Password change confirmation template._
