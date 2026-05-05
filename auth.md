@@ -1,6 +1,4 @@
-# Django Built-in Authentication and Authorisation
-
-## Table of Contents
+## Django Built-in Authentication and Authorisation
 
 1. [Setup](#setup)
 2. [The User Model](#the-user-model)
@@ -16,9 +14,7 @@
 12. [Custom Authentication Backend](#custom-authentication-backend)
 13. [Complete Walkthrough](#complete-walkthrough)
 
----
-
-## Setup
+### Setup
 
 Django's authentication system is provided by `django.contrib.auth` and is enabled by default in new projects. Verify these entries in `settings.py`:
 
@@ -43,7 +39,7 @@ Run `python manage.py migrate` to create the auth tables (`auth_user`, `auth_gro
 
 ---
 
-## The User Model
+### The User Model
 
 The default `User` model (`django.contrib.auth.models.User`) has these fields:
 
@@ -66,7 +62,7 @@ Superusers and staff users are not separate classes—they are regular `User` ob
 
 ---
 
-## Creating Users
+### Creating Users
 
 **From the shell:**
 
@@ -112,11 +108,11 @@ _Listing: Changing a password via the management command._
 
 ---
 
-## Authentication Functions
+### Authentication Functions
 
 Django provides three core functions in `django.contrib.auth`:
 
-### authenticate()
+#### authenticate()
 
 Verifies credentials and returns a `User` object or `None`:
 
@@ -134,7 +130,7 @@ else:
 
 _Listing: Verifying user credentials._
 
-### login()
+#### login()
 
 Attaches an authenticated user to the current session:
 
@@ -156,7 +152,7 @@ def login_view(request):
 
 _Listing: A complete login view._
 
-### logout()
+#### logout()
 
 Removes the user from the session:
 
@@ -172,7 +168,7 @@ _Listing: A logout view._
 
 > **Note:** `logout()` flushes the entire session. Any data stored in the session is lost.
 
-### request.user
+#### request.user
 
 Every request has a `user` attribute. For authenticated users it is a `User` instance; for anonymous visitors it is an `AnonymousUser` instance:
 
@@ -188,9 +184,9 @@ _Listing: Checking authentication status via request.user._
 
 ---
 
-## Restricting Access
+### Restricting Access
 
-### Function-Based Views — @login_required
+#### Function-Based Views — @login_required
 
 ```python
 from django.contrib.auth.decorators import login_required
@@ -214,7 +210,7 @@ def dashboard(request):
 
 _Listing: Customising the login URL and redirect field name._
 
-### Class-Based Views — LoginRequiredMixin
+#### Class-Based Views — LoginRequiredMixin
 
 ```python
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -230,7 +226,7 @@ _Listing: Restricting a class-based view to authenticated users._
 
 > **Important:** `LoginRequiredMixin` must be the **leftmost** parent in the inheritance list.
 
-### @user_passes_test
+#### @user_passes_test
 
 Restricts access based on a custom condition:
 
@@ -262,7 +258,7 @@ class AdminPanel(UserPassesTestMixin, TemplateView):
 
 _Listing: UserPassesTestMixin for class-based views._
 
-### @permission_required
+#### @permission_required
 
 Checks whether a user has a specific permission:
 
@@ -295,7 +291,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
 
 _Listing: PermissionRequiredMixin for class-based views._
 
-### LoginRequiredMiddleware (Django 5.1+)
+#### LoginRequiredMiddleware (Django 5.1+)
 
 Makes all views require authentication by default. Individual views can opt out:
 
@@ -319,9 +315,9 @@ _Listing: Global login requirement with per-view opt-out._
 
 ---
 
-## Permissions and Groups
+### Permissions and Groups
 
-### Default Permissions
+#### Default Permissions
 
 Django automatically creates four permissions for every model: `add`, `change`, `delete`, and `view`. The format is `<app_label>.<action>_<model_name>`:
 
@@ -334,7 +330,7 @@ user.has_perm('myapp.view_post')      # Can view?
 
 _Listing: Checking default permissions._
 
-### Custom Permissions
+#### Custom Permissions
 
 Define custom permissions in the model's `Meta` class:
 
@@ -354,7 +350,7 @@ _Listing: Defining custom permissions._
 
 Run `python manage.py migrate` to create them.
 
-### Creating Permissions Programmatically
+#### Creating Permissions Programmatically
 
 ```python
 from django.contrib.auth.models import Permission
@@ -371,7 +367,7 @@ permission = Permission.objects.create(
 
 _Listing: Creating a permission programmatically._
 
-### Assigning Permissions to Users
+#### Assigning Permissions to Users
 
 ```python
 from django.contrib.auth.models import User, Permission
@@ -391,7 +387,7 @@ _Listing: Assigning and checking permissions on a user._
 
 > **Note:** Permissions are cached on the `User` object. After adding or removing permissions, re-fetch the user from the database.
 
-### Groups
+#### Groups
 
 A `Group` is a collection of permissions that can be assigned to multiple users at once:
 
@@ -428,7 +424,7 @@ _Table: Group and permission management methods._
 
 ---
 
-## Built-in Auth Views
+### Built-in Auth Views
 
 Django provides class-based views for login, logout, and password management. Include them all at once:
 
@@ -460,7 +456,7 @@ _Table: Built-in auth URL patterns._
 
 > **Important:** Django does **not** provide default templates. You must create them yourself in a `registration/` directory inside your templates folder.
 
-### Key Settings
+#### Key Settings
 
 ```python
 # settings.py
@@ -471,7 +467,7 @@ LOGOUT_REDIRECT_URL = '/'                  # Where LogoutView redirects after lo
 
 _Listing: Authentication-related settings._
 
-### Customising Individual Views
+#### Customising Individual Views
 
 ```python
 from django.contrib.auth import views as auth_views
@@ -490,7 +486,7 @@ urlpatterns = [
 
 _Listing: Customising auth views with keyword arguments._
 
-### Login Template Example
+#### Login Template Example
 
 Create `templates/registration/login.html`:
 
@@ -519,7 +515,7 @@ _Listing: A minimal login template._
 
 ---
 
-## Built-in Auth Forms
+### Built-in Auth Forms
 
 All forms are in `django.contrib.auth.forms`:
 
@@ -535,7 +531,7 @@ _Table: Built-in authentication forms._
 | `PasswordResetForm`       | Enter email to receive a reset link.                       |
 | `AdminPasswordChangeForm` | Used in admin to change a user's password.                 |
 
-### Using UserCreationForm for Registration
+#### Using UserCreationForm for Registration
 
 ```python
 # views.py
@@ -573,7 +569,7 @@ _Listing: Registration view using UserCreationForm._
 
 _Listing: Registration template._
 
-### Extending UserCreationForm
+#### Extending UserCreationForm
 
 ```python
 # forms.py
@@ -590,11 +586,11 @@ _Listing: Adding extra fields to the registration form._
 
 ---
 
-## Auth Data in Templates
+### Auth Data in Templates
 
 The `django.contrib.auth.context_processors.auth` context processor (enabled by default) provides two variables in every template:
 
-### {{ user }}
+#### {{ user }}
 
 ```html
 <pre>
@@ -609,7 +605,7 @@ The `django.contrib.auth.context_processors.auth` context processor (enabled by 
 
 _Listing: Using the user variable in templates._
 
-### {{ perms }}
+#### {{ perms }}
 
 ```html
 <pre>
@@ -627,9 +623,9 @@ _Listing: Checking permissions in templates._
 
 ---
 
-## Password Management
+### Password Management
 
-### Session Invalidation on Password Change
+#### Session Invalidation on Password Change
 
 When a user changes their password, all their other sessions are invalidated. Django's built-in `PasswordChangeView` handles this automatically. For custom password change views, use `update_session_auth_hash()`:
 
@@ -651,7 +647,7 @@ def change_password(request):
 
 _Listing: Custom password change view with session preservation._
 
-### Password Reset via Email
+#### Password Reset via Email
 
 Requires email configuration in `settings.py`:
 
@@ -682,9 +678,9 @@ _Listing: Password reset email template._
 
 ---
 
-## Custom User Model
+### Custom User Model
 
-### Using AbstractUser (Recommended for New Projects)
+#### Using AbstractUser (Recommended for New Projects)
 
 Extends the default user model with additional fields while keeping all built-in functionality:
 
@@ -715,7 +711,7 @@ _Listing: Custom user model using AbstractUser._
 
 > **Warning:** Set `AUTH_USER_MODEL` **before** running `migrate` for the first time. Changing it mid-project requires manual schema changes.
 
-### Using AbstractBaseUser (Full Control)
+#### Using AbstractBaseUser (Full Control)
 
 For completely custom user models (e.g., email-based login instead of username):
 
@@ -755,7 +751,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 _Listing: Custom user model using AbstractBaseUser for email-based authentication._
 
-### Extending with a Profile Model (No Custom User Model)
+#### Extending with a Profile Model (No Custom User Model)
 
 If you cannot change the user model, use a one-to-one relationship:
 
@@ -773,7 +769,7 @@ class Profile(models.Model):
 
 _Listing: Profile model linked to the default User._
 
-### Referencing the User Model
+#### Referencing the User Model
 
 Always use `get_user_model()` or `settings.AUTH_USER_MODEL` instead of importing `User` directly:
 
@@ -795,7 +791,7 @@ _Listing: Properly referencing the user model._
 
 ---
 
-## Custom Authentication Backend
+### Custom Authentication Backend
 
 To authenticate against a source other than the database (e.g., email instead of username, LDAP, external API):
 
@@ -834,7 +830,7 @@ _Listing: Custom authentication backend for email-based login._
 
 ---
 
-## Complete Walkthrough
+### Complete Walkthrough
 
 A complete example combining built-in views, registration, and a protected dashboard.
 
