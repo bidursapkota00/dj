@@ -2057,6 +2057,21 @@ _Table: Django relationship field types._
 
 A one-to-many relationship exists when a single record in one table is associated with multiple records in another. In Django, this is represented using `ForeignKey` on the "many" side of the relationship.
 
+**Resetting migrations and the database.** Because the `author` field on `Book` was previously declared as a `CharField` (a plain string), changing it to a `ForeignKey` (a relationship to an `Author` model) creates a conflict that Django's migration system cannot resolve automatically. The simplest solution during development is to delete all existing migration files and the database, then regenerate everything from scratch:
+
+```bash
+# Delete all migration files except __init__.py
+# (inside each app's migrations/ folder)
+del book_outlet\migrations\0*.py
+
+# Delete the SQLite database
+del db.sqlite3
+```
+
+_Listing: Removing migration files and the database to resolve field type conflicts._
+
+> **Note:** This approach is only appropriate during development. In production, data-preserving migration strategies (such as multi-step migrations that rename columns and copy data) must be used instead.
+
 **Defining the models.** The `Author` model is created as a separate entity, and the `Book` model references it through a `ForeignKey`:
 
 ```python
@@ -4283,7 +4298,7 @@ _Listing: Registering the profiles app in settings._
   <link rel="stylesheet" href="{% static "profiles/styles.css" %}">
 </head>
 <body>
-  <form action="/profiles/" method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="image" />
     <button>Upload!</button>
@@ -4337,7 +4352,7 @@ urlpatterns = [
 
 _Listing: URL configuration for the profiles app._
 
-> **Note:** The `temp/` directory must be created manually inside the project root (outside any app folder). This raw approach writes all uploads to the same filename, which is not suitable for production—it is shown here only to demonstrate the low-level `request.FILES` API.
+> **Note:** The `temp/` directory must be created manually inside the project root (outside any app folder). This raw approach writes all uploads to the same filename, which is not suitable for production—it is shown here only to demonstrate the low-level `request.FILES` API. Django provides `FileSystemStorage` (`django.core.files.storage.FileSystemStorage`) as a built-in storage backend that handles file naming conflicts, path resolution, and directory creation automatically. The `FileField` and `ImageField` model fields use `FileSystemStorage` by default under the hood.
 
 ### Using Django Forms for File Uploads
 
@@ -4370,7 +4385,7 @@ The template is updated to render the form object:
   <link rel="stylesheet" href="{% static "profiles/styles.css" %}">
 </head>
 <body>
-  <form action="/profiles/" method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form }}
     <button>Upload!</button>
