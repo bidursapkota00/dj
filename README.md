@@ -2110,7 +2110,7 @@ python manage.py migrate
 
 _Listing: Creating and applying the relationship migration._
 
-**Working with ForeignKey in the shell.** The following session demonstrates creating related records and querying across relationships:
+**Working with ForeignKey in the shell.** Launch the Django shell with `python manage.py shell`. The following session demonstrates creating related records and querying across relationships:
 
 ```python
 >>> from book_outlet.models import Book, Author
@@ -2241,7 +2241,7 @@ python manage.py migrate
 
 _Listing: Creating and applying the one-to-one relationship migration._
 
-**Working with OneToOneField in the shell.** The following session demonstrates assigning addresses to authors and accessing the relationship in both directions:
+**Working with OneToOneField in the shell.** Launch the Django shell with `python manage.py shell`. The following session demonstrates assigning addresses to authors and accessing the relationship in both directions:
 
 ```python
 >>> from book_outlet.models import Author, Address, Book
@@ -2326,7 +2326,7 @@ python manage.py migrate
 
 _Listing: Creating and applying the many-to-many relationship migration._
 
-**Working with ManyToManyField in the shell.** Unlike `ForeignKey` and `OneToOneField`, many-to-many relationships cannot be set through the constructor. Instead, the `add()` method is used after both records have been saved:
+**Working with ManyToManyField in the shell.** Launch the Django shell with `python manage.py shell`. Unlike `ForeignKey` and `OneToOneField`, many-to-many relationships cannot be set through the constructor. Instead, the `add()` method is used after both records have been saved:
 
 ```python
 >>> from book_outlet.models import Country, Book
@@ -3191,7 +3191,7 @@ def review(request):
 
 _Listing: View saving validated form data to the database._
 
-The saved data can be verified in the Django shell:
+The saved data can be verified in the Django shell (`python manage.py shell`):
 
 ```python
 >>> from reviews.models import Review
@@ -4512,7 +4512,7 @@ class CreateProfileView(View):
 
 _Listing: View saving uploaded files through the UserProfile model._
 
-**Inspecting stored files in the shell.** The `FileField` provides attributes for accessing the file's path, URL, and size:
+**Inspecting stored files in the shell.** Launch the Django shell with `python manage.py shell`. The `FileField` provides attributes for accessing the file's path, URL, and size:
 
 ```python
 >>> from profiles.models import UserProfile
@@ -8918,7 +8918,7 @@ _Listing: SinglePostView handling GET and POST with form validation._
 
 The `post()` method validates the submitted form. If valid, `comment_form.save(commit=False)` creates a `Comment` instance without saving to the database, allowing the `post` foreign key to be set manually. After saving, `HttpResponseRedirect` redirects to the same page (the Post/Redirect/Get pattern prevents duplicate submissions on refresh). If the form is invalid, the template is re-rendered with the form containing error messages.
 
-**Verifying comments in the shell:**
+**Verifying comments in the shell** (`python manage.py shell`)**:**
 
 ```text
 >>> from blog.models import Comment
