@@ -7307,6 +7307,116 @@ Once pushed, every commit to the `main` branch triggers the workflow. GitHub cre
 
 ## Deployment
 
+### General Deployment Checklist
+
+The following checklist covers the essential configuration changes required before deploying any Django project to a production server.
+
+**1. Disable debug mode.** Set `DEBUG` to `False` directly or control it through an environment variable so that sensitive error details are never exposed to end users:
+
+```python
+import os
+
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+```
+
+_Listing: Controlling DEBUG via an environment variable._
+
+**2. Configure allowed hosts.** Specify the domain names or IP addresses that Django is permitted to serve. This can be set manually or populated from an environment variable:
+
+```python
+# Manual
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+
+# Or from an environment variable (comma-separated)
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+```
+
+_Listing: Configuring ALLOWED_HOSTS for production._
+
+**3. Secure the secret key.** Never hard-code the secret key in source control. Load it from an environment variable:
+
+```python
+SECRET_KEY = os.environ.get('SECRET_KEY')
+```
+
+_Listing: Loading SECRET_KEY from an environment variable._
+
+**4. Configure static (and media) files.** Set `STATIC_ROOT` so that `collectstatic` has a target directory, and update the project-level `urls.py` if Django should serve them during development. In production, static and media files are typically served by the web server (Nginx, Apache) or from cloud storage (S3 bucket with separate `static/` and `media/` prefixes):
+
+```python
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+```
+
+_Listing: Static and media root configuration._
+
+```bash
+python manage.py collectstatic
+```
+
+_Listing: Collecting static files into STATIC_ROOT._
+
+**5. Run migrations and create a superuser.** Ensure all migration files are committed and the database schema is up to date:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+_Listing: Applying migrations and creating the admin user._
+
+**6. Freeze requirements.** Generate a `requirements.txt` file so the server can install the exact same packages:
+
+```bash
+pip freeze > requirements.txt
+```
+
+_Listing: Generating requirements.txt._
+
+**7. Configure the WSGI (or ASGI) entry point.** Verify that `wsgi.py` (or `asgi.py`) points to the correct settings module. Production servers such as Gunicorn use this file to serve the application:
+
+```python
+# project_name/wsgi.py
+import os
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project_name.settings')
+application = get_wsgi_application()
+```
+
+_Listing: Default WSGI configuration._
+
+**8. Switch to PostgreSQL.** Install the PostgreSQL adapter and update `DATABASES` in `settings.py`:
+
+```bash
+pip install psycopg2-binary
+```
+
+_Listing: Installing the PostgreSQL adapter._
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': '<your-rds-db-username>',
+        'PASSWORD': '<your-rds-db-user-password>',
+        'HOST': '<your-rds-db-host>',
+        'PORT': '5432'
+    }
+}
+```
+
+_Listing: PostgreSQL database configuration (e.g. for AWS RDS)._
+
+> **Note:** If the database is hosted on a cloud service such as AWS RDS, add an inbound rule to the database security group allowing traffic from `0.0.0.0/0` (all IPv4 addresses) on port `5432`. Restrict this to your server's IP address in a production environment for security.
+
+---
+
 ### Deploying on Render
 
 Render is a cloud platform that supports automatic deployments from a Git repository. The following steps configure the CRUD application for production deployment.
