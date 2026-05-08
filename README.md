@@ -1,5 +1,9 @@
 # Django Complete Guide
 
+![Bidur Sapkota](https://www.bidursapkota.com.np/images/gravatar.webp "Bidur Sapkota - Developer")&nbsp;[Bidur Sapkota](https://www.bidursapkota.com.np/)
+
+![Django Complete Guide by Bidur Sapkota](/images/13-django-post-2-1200.webp "Django Complete Guide – Blog by Bidur Sapkota")
+
 ## Table of Content
 
 1. [The MVC Architectural Pattern](#the-mvc-architectural-pattern)
@@ -9213,7 +9217,6 @@ A hidden form in the post detail page submits the post ID to the `ReadLaterView`
 ```
 
 _Listing: Read Later form with conditional button text._
-
 
 ### Button Styles
 
