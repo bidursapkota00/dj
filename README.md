@@ -9214,6 +9214,33 @@ A hidden form in the post detail page submits the post ID to the `ReadLaterView`
 
 _Listing: Read Later form with conditional button text._
 
+
+### Button Styles
+
+```css
+/* blog/static/blog/post-detail.css (addition) */
+#read-later {
+  margin: 2rem 0;
+}
+
+#read-later button {
+  background-color: transparent;
+  border: 1px solid white;
+  padding: 0.5rem 2rem;
+  font: inherit;
+  color: white;
+  cursor: pointer;
+}
+
+#read-later button:hover,
+#read-later button:active {
+  background-color: white;
+  color: #390281;
+}
+```
+
+_Listing: Read Later button styles for the post detail page._
+
 The button text changes based on whether the post is already saved. The `SinglePostView` provides the `saved_for_later` context variable:
 
 ```python
@@ -9243,7 +9270,7 @@ class SinglePostView(View):
 
 _Listing: SinglePostView with session-aware saved_for_later context._
 
-The `is_stored_post()` helper checks whether the current post's ID exists in the session's `stored_posts` list. The same check should also be included in the `post()` method's context when re-rendering on validation failure.
+The `is_stored_post()` helper checks whether the current post's ID exists in the session's `stored_posts` list. **The same check should also be included in the `post()` method's context when re-rendering on validation failure.**
 
 ### Updating the Navigation
 
